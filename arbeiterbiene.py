@@ -2,6 +2,21 @@ import asyncio
 import discord
 import json
 import logging
+from discord.ext import commands
+
+
+bot = commands.Bot(('BOT! ', '!'))
+
+
+@bot.event
+async def on_ready():
+    print("Hello world!")
+#    await bot.logout()
+
+
+@bot.command()
+async def echo(msg):
+    await bot.say(msg)
 
 
 def configureFileLogging():
@@ -32,11 +47,8 @@ def main():
               '.json".')
         return
     # Create bot client.
-    client = discord.Client()
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(client.login(auth['token']))
-    # TODO: Something, now that we're logged in.
-    loop.run_until_complete(client.logout())
+    bot.run(auth['token'])
 
 
 if __name__=='__main__':
