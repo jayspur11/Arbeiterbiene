@@ -1,5 +1,4 @@
 import asyncio
-import discord
 import json
 import logging
 from discord.ext import commands
@@ -11,10 +10,14 @@ bot = commands.Bot(('BOT! ', '!'))
 async def on_ready():
     print("Hello world!")
 
+@bot.event
+async def on_message(message):
+    await bot.process_commands(message)
+
 ## Bot Commands
-@bot.command()
-async def echo(*args, **kwargs):
-    await bot.say(' '.join(args))
+@bot.command(pass_context=True)
+async def echo(context):
+    await bot.say(context.view.read_rest())
 
 ## Misc Functions
 def _configureFileLogging():
