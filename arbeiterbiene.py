@@ -4,22 +4,20 @@ import json
 import logging
 from discord.ext import commands
 
-
 bot = commands.Bot(('BOT! ', '!'))
 
-
+## Bot Events
 @bot.event
 async def on_ready():
     print("Hello world!")
-#    await bot.logout()
 
-
+## Bot Commands
 @bot.command()
-async def echo(msg):
-    await bot.say(msg)
+async def echo(*args, **kwargs):
+    await bot.say(' '.join(args))
 
-
-def configureFileLogging():
+## Misc Functions
+def _configureFileLogging():
     '''
     Configures the logging module to output logs to file ('discord.log').
     '''
@@ -37,7 +35,7 @@ def main():
     '''
     The entry point of the Arbeiterbiene bot.
     '''
-    # Grab authentication info.
+    _configureFileLogging()
     try:
         with open('auth.json', 'r') as authfile:
             auth = json.load(authfile)
@@ -46,8 +44,6 @@ def main():
               '"arbeiterbiene.py". It should follow the format of "example-auth'
               '.json".')
         return
-    # Create bot client.
-    loop = asyncio.get_event_loop()
     bot.run(auth['token'])
 
 
