@@ -1,7 +1,12 @@
+# TODO (jaysen): Finish setting up modules!
+
 import asyncio
 import json
 import logging
 from discord.ext import commands
+from modules import gaming
+# Get this...you just call "gaming.process_command('test')", and it invokes
+# test(). Try it.
 
 bot = commands.Bot(('BOT! ', '!'))
 
