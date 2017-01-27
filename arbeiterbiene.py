@@ -19,6 +19,24 @@ async def on_message(message):
 async def echo(context):
     await bot.say(context.view.read_rest())
 
+@bot.command(pass_context=True)
+async def garble(context):
+    await bot.say(transform(context.view.read_rest()))
+
+@bot.command(pass_context=True)
+async def ungarble(context):
+    await bot.say(transform(context.view.read_rest()))
+
+## Helper Functions
+def transform(string):
+    result = ""
+    for char in string:
+        if str.isalpha(char):
+            result += chr((ord(char) ^ 31) - 4)
+        else:
+            result += char
+    return result
+
 ## Misc Functions
 def _configureFileLogging():
     '''
