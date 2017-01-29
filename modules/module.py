@@ -1,9 +1,15 @@
 '''
-This file defines some syntactic sugar for creating modules! To use it, import
-*everything*: `from .module import *`. Then, decorate your commands with
-`@module_command`, and they'll be reachable via the appropriate
-`process_message` invocation.
+This file defines some syntactic sugar for creating modules!
+
+To use it to define a module, import *everything*: `from .module import *`.
+Then, just decorate your commands with `@module_command`.
+
+To use a module defined this way, import the module as normal, then assign
+`module.bot` to the discord.Bot instance and pass any commands to the module via
+`module.process_message`.
 '''
+
+import discord
 
 bot = None
 module_commands = {}
