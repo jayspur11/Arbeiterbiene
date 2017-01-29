@@ -3,5 +3,5 @@
 from .module import *
 
 @module_command()
-def test():
+def test(message):
     print('hello world')

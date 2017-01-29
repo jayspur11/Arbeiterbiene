@@ -4,11 +4,15 @@ import asyncio
 import json
 import logging
 from discord.ext import commands
-from modules import gaming
-# Get this...you just call "gaming.process_command('test')", and it invokes
-# test(). Try it.
 
 bot = commands.Bot(('BOT! ', '!'))
+
+## Module Setup
+from modules import gaming
+
+module_registry = {
+    '$': gaming,
+}
 
 ## Bot Events
 @bot.event
@@ -17,7 +21,10 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    await bot.process_commands(message)
+    trigger = message.content[0]
+    if trigger in module_registry:
+        module_registry[trigger].process_message(message)
+    #await bot.process_commands(message)
 
 ## Bot Commands
 @bot.command(pass_context=True)
