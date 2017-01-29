@@ -1,11 +1,6 @@
-# TODO (jaysen): Finish setting up modules!
-
 import asyncio
 import json
 import logging
-from discord.ext import commands
-
-bot = commands.Bot(('BOT! ', '!'))
 
 ## Module Setup
 from modules import gaming
@@ -13,6 +8,13 @@ from modules import gaming
 module_registry = {
     '$': gaming,
 }
+
+## Bot Setup
+from discord.ext import commands
+
+bot = commands.Bot(('BOT! ', '!'))
+for trigger in module_registry:
+    module_registry[trigger].bot = bot
 
 ## Bot Events
 @bot.event
@@ -23,8 +25,7 @@ async def on_ready():
 async def on_message(message):
     trigger = message.content[0]
     if trigger in module_registry:
-        module_registry[trigger].process_message(message)
-    #await bot.process_commands(message)
+        await module_registry[trigger].process_message(message)
 
 ## Bot Commands
 @bot.command(pass_context=True)
