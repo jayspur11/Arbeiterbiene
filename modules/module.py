@@ -1,4 +1,9 @@
-# TODO (jaysen): Document this file!
+'''
+This file defines some syntactic sugar for creating modules! To use it, import
+*everything*: `from .module import *`. Then, decorate your commands with
+`@module_command`, and they'll be reachable via the appropriate
+`process_message` invocation.
+'''
 
 bot = None
 module_commands = {}
