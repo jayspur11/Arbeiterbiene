@@ -2,7 +2,7 @@
 import random
 from .module import *
 
-@module_command()
+@module_command
 async def roll(message):
     split = message.content.split('d', 1)
     die_size = int(split[1])
@@ -24,9 +24,8 @@ def scion_result_message(successes, results):
     else:
         message = str(successes) + ' successes! ' + message
     return message
-        
 
-@module_command()
+@module_command
 async def scion(message):
     numDice = int(message.content)
     if numDice > 0:
@@ -38,4 +37,3 @@ async def scion(message):
                 successes += 1
         results.sort()
         await bot.send_message(message.channel, scion_result_message(successes, results))
-

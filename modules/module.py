@@ -3,10 +3,8 @@
 bot = None
 module_commands = {}
 
-def module_command(*args, **kwargs):
-    def decorator(func):
-        module_commands[func.__name__] = func
-    return decorator
+def module_command(func):
+    module_commands[func.__name__] = func
 
 async def process_message(message):
     content = message.content.split(' ', 1)
