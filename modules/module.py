@@ -28,6 +28,12 @@ def module_command(func):
     module_commands[func.__name__] = func
 
 async def process_message(message):
+    '''
+    Coroutine to process an incoming command for this module.
+    
+    message (discord.Message):
+        The message received from the server.
+    '''
     content = message.content.split(' ', 1)
     cmd = content[0][1:]
     message.content = content[1]
