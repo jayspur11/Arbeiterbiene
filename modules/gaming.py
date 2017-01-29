@@ -1,9 +1,27 @@
-# TODO (jaysen): Expand this file!
+'''
+Module for gaming-related commands.
+
+A command belongs here if it...
+ - is a tool to aid in gaming, or
+ - is a game.
+
+A command does *not* belong here if it...
+ - is a tool that isn't related to gaming, or
+ - is a picture of Hitler.
+'''
+
 import random
 from .module import *
 
+## Commands
 @module_command
 async def roll(message):
+    '''
+    Rolls dice and sends the ordered results to where the command came from.
+       
+    Usage: `$roll XdY`
+        where `X` is the number of dice to roll, and `Y` is the number of sides.
+    '''
     split = message.content.split('d', 1)
     die_size = int(split[1])
     results = []
@@ -16,6 +34,22 @@ async def roll(message):
 
 @module_command
 async def scion(message):
+    '''
+    Rolls dice according to White Wolf's *Scion* rules and sends the result to
+    where the command came from.
+    
+    Usage: `$scion X e# s#`
+        where `X` is the number of dice to roll, `e#` is the number of dots of
+        an Epic Attribute involved, and `s#` is the number of automatic
+        successes to add (do not include Epics in this number).
+        **Notes:**
+         - `#e` and `#s` are also accepted.
+         - If using multiple Epic Attributes, include `e#` multiple times.
+           (e.g. `$scion 7 e3 e4`)
+         - If you don't like adding, you can include multiple raw numbers and
+           they'll get added together to make your dice pool.
+           (e.g. `$scion 3 4`)
+    '''
     num_dice = 0
     successes = 0
     for arg in message.content.split(' '):
@@ -37,12 +71,18 @@ async def scion(message):
         if result == 10:
             successes += 1
         results.append(result)
-    results.sort()
     await bot.send_message(message.channel,
                            scion_result_message(successes, results))
 
 ## Helper Functions
 def scion_epic_successes(epic_attr_value):
+    '''
+    Calculates the number of automatic successes a Scion gets for a given number
+    of Epic Attribute dots.
+    
+    epic_attr_value (int):
+        The number of dots the Scion has in an Epic Attribute.
+    '''
     if epic_attr_value == 0:
         return 0
     epic_successes = 1
@@ -51,6 +91,16 @@ def scion_epic_successes(epic_attr_value):
     return epic_successes
 
 def scion_result_message(successes, results):
+    '''
+    Formats a message for Scion roll results.
+    
+    successes (int):
+        The number of successes garnered by the roll.
+    
+    results (list(int)):
+        The values rolled.
+    '''
+    results.sort()
     firstResult = results[0] if len(results) else 0
     for i, item in enumerate(results):
         results[i] = str(item)
