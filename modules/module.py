@@ -8,8 +8,8 @@ def module_command(func):
     Decorator to add a function as a command in the module.
     
     func (function):
-        The function to be registered in the module. It must take 1 argument of
-        type `discord.Message`.
+        The function to be registered in the module. It must be `async` and take
+        1 argument of type `discord.Message`.
         **Note:** `message.content` will have the command stripped from
         the front, leaving only the relevant pieces of the command in the
         string.
@@ -21,7 +21,7 @@ def module_command(func):
     Usage:
         ```
         @module_command
-        def <function_name>(message):
+        async def <function_name>(message):
             ...
         ```
     '''
