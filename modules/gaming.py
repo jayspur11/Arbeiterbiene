@@ -13,3 +13,29 @@ async def roll(message):
     for i, item in enumerate(results):
         results[i] = str(item)
     await bot.send_message(message.channel, ' + '.join(results))
+
+def scion_result_message(successes, results):
+    firstResult = results[0]
+    for i, item in enumerate(results):
+        results[i] = str(item)
+    message = ' + '.join(results)
+    if successes == 0 and firstResult == 1:
+        message = 'A botch! ' + message
+    else:
+        message = str(successes) + ' successes! ' + message
+    return message
+        
+
+@module_command()
+async def scion(message):
+    numDice = int(message.content)
+    if numDice > 0:
+        results = []
+        successes = 0
+        for i in range(numDice):
+            results.append(random.randint(1, 10))
+            if results[-1] > 6:
+                successes += 1
+        results.sort()
+        await bot.send_message(message.channel, scion_result_message(successes, results))
+
