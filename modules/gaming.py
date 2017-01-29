@@ -27,13 +27,16 @@ def scion_result_message(successes, results):
 
 @module_command
 async def scion(message):
-    numDice = int(message.content)
+    split = message.content.split(' ', 1)
+    numDice = int(split[0])
+    successes = int(split[1])
     if numDice > 0:
         results = []
-        successes = 0
         for i in range(numDice):
             results.append(random.randint(1, 10))
             if results[-1] > 6:
+                successes += 1
+            if results[-1] == 10:
                 successes += 1
         results.sort()
         await bot.send_message(message.channel, scion_result_message(successes, results))
