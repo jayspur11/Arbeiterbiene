@@ -26,6 +26,8 @@ async def on_message(message):
     trigger = message.content[0]
     if trigger in module_registry:
         await module_registry[trigger].process_message(message)
+    else:
+        await bot.process_commands(message)
 
 ## Bot Commands
 @bot.command(pass_context=True)
