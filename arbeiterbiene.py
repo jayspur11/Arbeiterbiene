@@ -29,6 +29,10 @@ async def on_message(message):
         await shared.bot.process_commands(message)
 
 ## Bot Commands
+@shared.bot.command()
+async def die():
+    raise KeyboardInterrupt
+
 @shared.bot.command(pass_context=True)
 async def echo(context):
     await shared.bot.say(context.view.read_rest())
