@@ -1,17 +1,18 @@
 '''
 This file defines some syntactic sugar for creating modules!
 
-To use it to define a module, import *everything*: `from .module import *`.
+To use it to define a module, import *everything*:
+`from modules.module import *`.
 Then, just decorate your commands with `@module_command`.
 
-To use a module defined this way, import the module as normal, then assign
-`module.bot` to the discord.Bot instance and pass any commands to the module via
-`module.process_message`.
+To use a module defined this way, import the module as normal, then pass any
+commands to the module via `module.process_message`.
+**Note:** You'll need to configure the global variables in `shared.py`.
 '''
 
+from modules import shared
 import discord
 
-bot = None
 module_commands = {}
 
 def module_command(func):
@@ -47,8 +48,13 @@ async def process_message(message):
     '''
     content = message.content.split(' ', 1)
     cmd = content[0][1:]
-    message.content = content[1]
     if cmd in module_commands:
-        await module_commands[cmd](message)
+        func = module_commands[cmd]
+        try:
+            message.content = content[1]
+            await func(message)
+        except (IndexError, ValueError):
+            await shared.bot.send_message(message.channel, func.__doc__)
+            pass
     else:
         raise KeyError

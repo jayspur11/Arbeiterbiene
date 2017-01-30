@@ -10,17 +10,17 @@ A command does *not* belong here if it...
  - is a picture of Hitler.
 '''
 
+from modules import shared
+from modules.module import *
 import random
-from .module import *
 
 ## Commands
 @module_command
 async def roll(message):
-    '''
+    '''```$roll XdY```
     Rolls dice and sends the ordered results to where the command came from.
-       
-    Usage: `$roll XdY`
-        where `X` is the number of dice to roll, and `Y` is the number of sides.
+    
+    `X` is the number of dice to roll, and `Y` is the number of sides.
     '''
     split = message.content.split('d', 1)
     die_size = int(split[1])
@@ -30,29 +30,31 @@ async def roll(message):
     results.sort()
     for i, item in enumerate(results):
         results[i] = str(item)
-    await bot.send_message(message.channel, ' + '.join(results))
+    await shared.bot.send_message(message.channel, ' + '.join(results))
 
 @module_command
 async def scion(message):
-    '''
+    '''```$scion X e# s#```
     Rolls dice according to White Wolf's *Scion* rules and sends the result to
     where the command came from.
     
-    Usage: `$scion X e# s#`
-        where `X` is the number of dice to roll, `e#` is the number of dots of
-        an Epic Attribute involved, and `s#` is the number of automatic
-        successes to add (do not include Epics in this number).
-        **Notes:**
-         - `#e` and `#s` are also accepted.
-         - If using multiple Epic Attributes, include `e#` multiple times.
-           (e.g. `$scion 7 e3 e4`)
-         - If you don't like adding, you can include multiple raw numbers and
-           they'll get added together to make your dice pool.
-           (e.g. `$scion 3 4`)
+    `X` is the number of dice to roll, `e#` is the number of dots of
+    an Epic Attribute involved, and `s#` is the number of automatic
+    successes to add (do not include Epics in this number).
+    **Notes:**
+     - `#e` and `#s` are also accepted.
+     - If using multiple Epic Attributes, include `e#` multiple times.
+       (e.g. `$scion 7 e3 e4`)
+     - If you don't like adding, you can include multiple raw numbers and
+       they'll get added together to make your dice pool.
+       (e.g. `$scion 3 4`)
     '''
     num_dice = 0
     successes = 0
-    for arg in message.content.split(' '):
+    args = message.content.split(' ')
+    if not count(args):
+        raise ValueError
+    for arg in args:
         if arg[0] == 's':
             successes += int(arg[1:])
         elif arg[-1] == 's':
@@ -71,7 +73,7 @@ async def scion(message):
         if result == 10:
             successes += 1
         results.append(result)
-    await bot.send_message(message.channel,
+    await shared.bot.send_message(message.channel,
                            scion_result_message(successes, results))
 
 ## Helper Functions

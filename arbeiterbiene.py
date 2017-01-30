@@ -1,3 +1,4 @@
+from modules import shared
 import asyncio
 import json
 import logging
@@ -12,35 +13,33 @@ module_registry = {
 ## Bot Setup
 from discord.ext import commands
 
-bot = commands.Bot(('BOT! ', '!'))
-for trigger in module_registry:
-    module_registry[trigger].bot = bot
+shared.bot = commands.Bot(('BOT! ', '!'))
 
 ## Bot Events
-@bot.event
+@shared.bot.event
 async def on_ready():
     print("Hello world!")
 
-@bot.event
+@shared.bot.event
 async def on_message(message):
     trigger = message.content[0]
     if trigger in module_registry:
         await module_registry[trigger].process_message(message)
     else:
-        await bot.process_commands(message)
+        await shared.bot.process_commands(message)
 
 ## Bot Commands
-@bot.command(pass_context=True)
+@shared.bot.command(pass_context=True)
 async def echo(context):
-    await bot.say(context.view.read_rest())
+    await shared.bot.say(context.view.read_rest())
 
-@bot.command(pass_context=True)
+@shared.bot.command(pass_context=True)
 async def garble(context):
-    await bot.say(transform(context.view.read_rest()))
+    await shared.bot.say(transform(context.view.read_rest()))
 
-@bot.command(pass_context=True)
+@shared.bot.command(pass_context=True)
 async def ungarble(context):
-    await bot.say(transform(context.view.read_rest()))
+    await shared.bot.say(transform(context.view.read_rest()))
 
 ## Helper Functions
 def transform(string):
@@ -80,7 +79,7 @@ def main():
               '"arbeiterbiene.py". It should follow the format of "example-auth'
               '.json".')
         return
-    bot.run(auth['token'])
+    shared.bot.run(auth['token'])
 
 
 if __name__=='__main__':
