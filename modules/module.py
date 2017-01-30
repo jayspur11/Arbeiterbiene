@@ -1,4 +1,6 @@
 '''
+# module.py
+
 This file defines some syntactic sugar for creating modules!
 
 To use it to define a module, import *everything*:

@@ -1,4 +1,6 @@
 '''
+# gaming.py
+
 Module for gaming-related commands.
 
 A command belongs here if it...
