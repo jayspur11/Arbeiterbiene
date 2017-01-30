@@ -11,15 +11,19 @@ import asyncio
 import json
 import logging
 
+shared.bot = commands.Bot(('BOT! ', '!'))
+
 ## Module Setup
 '''
 How To Module:
 Import the module from `modules`. Then add it to the `module_registry` dict,
 with its trigger character as the key.
 '''
+from modules import core
 from modules import gaming
 
 module_registry = {
+    '!': core,
     '$': gaming,
 }
 
@@ -33,37 +37,6 @@ async def on_message(message):
     trigger = message.content[0]
     if trigger in module_registry:
         await module_registry[trigger].process_message(message)
-    else:
-        # TODO: Remove this after the commands have been migrated.
-        await shared.bot.process_commands(message)
-
-## Bot Commands
-# TODO: Move these to a 'core' module.
-@shared.bot.command()
-async def die():
-    raise KeyboardInterrupt
-
-@shared.bot.command(pass_context=True)
-async def echo(context):
-    await shared.bot.say(context.view.read_rest())
-
-@shared.bot.command(pass_context=True)
-async def garble(context):
-    await shared.bot.say(transform(context.view.read_rest()))
-
-@shared.bot.command(pass_context=True)
-async def ungarble(context):
-    await shared.bot.say(transform(context.view.read_rest()))
-
-## Helper Functions
-def transform(string):
-    result = ""
-    for char in string:
-        if str.isalpha(char):
-            result += chr((ord(char) ^ 31) - 4)
-        else:
-            result += char
-    return result
 
 ## Misc Functions
 def _configureFileLogging():
@@ -84,7 +57,6 @@ def main():
     '''
     The entry point of the Arbeiterbiene bot.
     '''
-    shared.bot = commands.Bot(('BOT! ', '!'))
     _configureFileLogging()
     try:
         with open('auth.json', 'r') as authfile:

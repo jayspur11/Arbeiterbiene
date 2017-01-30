@@ -24,6 +24,8 @@ async def roll(message):
     
     `X` is the number of dice to roll, and `Y` is the number of sides.
     '''
+    if not len(message.content):
+        raise ValueError
     split = message.content.split('d', 1)
     die_size = int(split[1])
     results = []
@@ -51,11 +53,11 @@ async def scion(message):
        they'll get added together to make your dice pool.
        (e.g. `$scion 3 4`)
     '''
+    if not len(message.content):
+        raise ValueError
     num_dice = 0
     successes = 0
     args = message.content.split(' ')
-    if not count(args):
-        raise ValueError
     for arg in args:
         if arg[0] == 's':
             successes += int(arg[1:])

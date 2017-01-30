@@ -53,7 +53,7 @@ async def process_message(message):
     if cmd in module_commands:
         func = module_commands[cmd]
         try:
-            message.content = content[1]
+            message.content = content[1] if len(content) > 1 else ''
             await func(message)
         except (IndexError, ValueError):
             await shared.bot.send_message(message.channel, func.__doc__)
