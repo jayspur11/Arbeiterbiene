@@ -1,25 +1,45 @@
+'''
+# arbeiterbiene.py
+
+This is the main file for the Discord bot. It's responsible for the primary
+setup of the bot, as well as pulling in and configuring all the modules.
+'''
+
+from discord.ext import commands
+from modules import shared
 import asyncio
-import discord
 import json
 import logging
-from discord.ext import commands
 
+shared.bot = commands.Bot(('BOT! ', '!'))
 
-bot = commands.Bot(('BOT! ', '!'))
+## Module Setup
+'''
+How To Module:
+Import the module from `modules`. Then add it to the `module_registry` dict,
+with its trigger character as the key.
+'''
+from modules import core
+from modules import gaming
 
+module_registry = {
+    '!': core,
+    '$': gaming,
+}
 
-@bot.event
+## Bot Events
+@shared.bot.event
 async def on_ready():
     print("Hello world!")
-#    await bot.logout()
 
+@shared.bot.event
+async def on_message(message):
+    trigger = message.content[0]
+    if trigger in module_registry:
+        await module_registry[trigger].process_message(message)
 
-@bot.command()
-async def echo(msg):
-    await bot.say(msg)
-
-
-def configureFileLogging():
+## Misc Functions
+def _configureFileLogging():
     '''
     Configures the logging module to output logs to file ('discord.log').
     '''
@@ -37,7 +57,7 @@ def main():
     '''
     The entry point of the Arbeiterbiene bot.
     '''
-    # Grab authentication info.
+    _configureFileLogging()
     try:
         with open('auth.json', 'r') as authfile:
             auth = json.load(authfile)
@@ -46,9 +66,7 @@ def main():
               '"arbeiterbiene.py". It should follow the format of "example-auth'
               '.json".')
         return
-    # Create bot client.
-    loop = asyncio.get_event_loop()
-    bot.run(auth['token'])
+    shared.bot.run(auth['token'])
 
 
 if __name__=='__main__':
