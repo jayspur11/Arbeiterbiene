@@ -38,7 +38,6 @@ async def echo(message):
         raise ValueError
     await shared.bot.send_message(message.channel, message.content)
 
-# TODO: Fix this one so it's not so dangerous.
 @module_command
 async def garble(message):
     '''```!garble <msg>```
