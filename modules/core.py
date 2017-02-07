@@ -15,6 +15,8 @@ A command does *not* belong here if it...
 from modules import shared
 from modules.module import *
 
+module_name = 'Core'
+
 ## Commands
 @module_command
 async def die(message):

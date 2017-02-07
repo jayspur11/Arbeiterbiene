@@ -19,7 +19,6 @@ import discord
 # To be filled in by the inheriting module.
 
 module_commands = {}
-module_description = ''
 module_name = ''
 
 def module_command(func):
