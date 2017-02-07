@@ -22,7 +22,7 @@ with its trigger character as the key.
 from modules import core
 from modules import gaming
 
-module_registry = {
+shared.module_registry = {
     '!': core,
     '$': gaming,
 }
@@ -35,8 +35,8 @@ async def on_ready():
 @shared.bot.event
 async def on_message(message):
     trigger = message.content[0]
-    if trigger in module_registry:
-        await module_registry[trigger].process_message(message)
+    if trigger in shared.module_registry:
+        await shared.module_registry[trigger].process_message(message)
 
 ## Misc Functions
 def _configureFileLogging():
