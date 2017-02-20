@@ -16,6 +16,8 @@ from modules import shared
 from modules.module import *
 import random
 
+module_name = 'Gaming'
+
 ## Commands
 @module_command
 async def roll(message):

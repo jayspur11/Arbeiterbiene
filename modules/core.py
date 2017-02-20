@@ -15,6 +15,8 @@ A command does *not* belong here if it...
 from modules import shared
 from modules.module import *
 
+module_name = 'Core'
+
 ## Commands
 @module_command
 async def die(message):
@@ -38,7 +40,6 @@ async def echo(message):
         raise ValueError
     await shared.bot.send_message(message.channel, message.content)
 
-# TODO: Fix this one so it's not so dangerous.
 @module_command
 async def garble(message):
     '''```!garble <msg>```
@@ -60,6 +61,40 @@ async def garble(message):
     await shared.bot.send_message(
         message.channel,
         message.author.mention + ' ' + transform(message.content))
+
+@module_command
+async def help(message):
+    '''```!help [<trigger>[<command>]]```
+    Prints a help message, either on the bot in general or on a specific topic.
+    
+    `!help` by itself will print the available modules and their trigger
+      symbols.
+    
+    `!help <trigger>` will print the available commands in the module associated
+      with `<trigger>`.
+    
+    `!help <trigger><command>` will print that specific command's documentation.
+    '''
+    docs = []
+    if not len(message.content):
+        docs += list('Available modules:')
+        for trigger in shared.module_registry:
+            docs += list(' ' + shared.module_registry[trigger].module_name +
+                         ' (' + trigger + '),')
+        docs[-1] = '.'
+    else:
+        query = message.content.split(' ', 1)[0]
+        trigger = query[0]
+        queried_module = shared.module_registry[trigger]
+        if len(query) > 1:
+            docs = list(queried_module.module_commands[query[1:]].__doc__)
+        else:
+            docs = list('Available ' + queried_module.module_name +
+                        ' commands:')
+            for command in queried_module.module_commands:
+                docs += list(' ' + trigger + command + ',')
+            docs[-1] = '.'
+    await shared.bot.send_message(message.author, ''.join(docs))
 
 @module_command
 async def ungarble(message):
