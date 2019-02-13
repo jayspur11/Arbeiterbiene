@@ -1,7 +1,4 @@
-'''
-# core.py
-
-Module for core bot commands.
+""" Module for core bot commands.
 
 A command belongs here if it...
  - is a tool for bot management, or
@@ -10,39 +7,40 @@ A command belongs here if it...
 A command does *not* belong here if it...
  - is a tool that isn't related to the bot, or
  - is a picture of Hitler.
-'''
+"""
 
-from modules import shared
 from modules.module import *
 
 module_name = 'Core'
 
-## Commands
+
 @module_command
 async def die(message):
-    '''```!die```
+    """```!die```
     Logs the bot out & kills the running process.
-    '''
+    """
     await shared.bot.send_message(message.channel, ':(')
     raise KeyboardInterrupt
 
+
 # TODO: Fix this one so it's not so dangerous.
-#@module_command
+# @module_command
 async def echo(message):
-    '''```!echo <msg>```
+    """```!echo <msg>```
     Echoes the given message (`<msg>`) back to the server.
     
     **Notes:**
         Be careful with this one! Anyone can ask the bot to say *anything*,
         which is dangerous, because the bot might execute elevated commands.
-    '''
+    """
     if not len(message.content):
         raise ValueError
     await shared.bot.send_message(message.channel, message.content)
 
+
 @module_command
 async def garble(message):
-    '''```!garble <msg>```
+    """```!garble <msg>```
     Garbles the given message (`<msg>`) and echoes it back to the server.
     Also deletes the message that triggered the bot (but mentions the original
     sender).
@@ -54,17 +52,18 @@ async def garble(message):
        kind and delete it.
     
     **See Also:** `ungarble`
-    '''
+    """
     if not len(message.content):
         raise ValueError
     await shared.bot.delete_message(message)
     await shared.bot.send_message(
         message.channel,
-        message.author.mention + ' ' + transform(message.content))
+        message.author.mention + ' ' + _transform(message.content))
+
 
 @module_command
 async def help(message):
-    '''```!help [<trigger>[<command>]]```
+    """```!help [<trigger>[<command>]]```
     Prints a help message, either on the bot in general or on a specific topic.
     
     `!help` by itself will print the available modules and their trigger
@@ -74,7 +73,7 @@ async def help(message):
       with `<trigger>`.
     
     `!help <trigger><command>` will print that specific command's documentation.
-    '''
+    """
     docs = []
     if not len(message.content):
         docs += list('Available modules:')
@@ -96,21 +95,22 @@ async def help(message):
             docs[-1] = '.'
     await shared.bot.send_message(message.author, ''.join(docs))
 
+
 @module_command
 async def ungarble(message):
-    '''```!ungarble <msg>```
+    """```!ungarble <msg>```
     Ungarbles the given message (`<msg>`) and PMs it back to the sender. Also
     deletes the message that triggered the bot (for cleanliness!).
     
     **See Also:** `garble`
-    '''
+    """
     if not len(message.content):
         raise ValueError
     await shared.bot.delete_message(message)
-    await shared.bot.send_message(message.author, transform(message.content))
+    await shared.bot.send_message(message.author, _transform(message.content))
 
-## Helper Functions
-def transform(string):
+
+def _transform(string):
     result = ""
     for char in string:
         if str.isalpha(char):

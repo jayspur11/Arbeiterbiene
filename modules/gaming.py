@@ -1,7 +1,4 @@
-'''
-# gaming.py
-
-Module for gaming-related commands.
+""" Module for gaming-related commands.
 
 A command belongs here if it...
  - is a tool to aid in gaming, or
@@ -10,22 +7,21 @@ A command belongs here if it...
 A command does *not* belong here if it...
  - is a tool that isn't related to gaming, or
  - is a picture of Hitler.
-'''
+"""
 
-from modules import shared
 from modules.module import *
 import random
 
 module_name = 'Gaming'
 
-## Commands
+
 @module_command
 async def roll(message):
-    '''```$roll XdY```
+    """```$roll XdY```
     Rolls dice and sends the ordered results to where the command came from.
     
     `X` is the number of dice to roll, and `Y` is the number of sides.
-    '''
+    """
     if not len(message.content):
         raise ValueError
     split = message.content.split('d', 1)
@@ -38,9 +34,10 @@ async def roll(message):
         results[i] = str(item)
     await shared.bot.send_message(message.channel, ' + '.join(results))
 
+
 @module_command
 async def scion(message):
-    '''```$scion X e# s#```
+    """```$scion X e# s#```
     Rolls dice according to White Wolf's *Scion* rules and sends the result to
     where the command came from.
     
@@ -54,7 +51,7 @@ async def scion(message):
      - If you don't like adding, you can include multiple raw numbers and
        they'll get added together to make your dice pool.
        (e.g. `$scion 3 4`)
-    '''
+    """
     if not len(message.content):
         raise ValueError
     num_dice = 0
@@ -66,9 +63,9 @@ async def scion(message):
         elif arg[-1] == 's':
             successes += int(arg[:-1])
         elif arg[0] == 'e':
-            successes += scion_epic_successes(int(arg[1:]))
+            successes += _scion_epic_successes(int(arg[1:]))
         elif arg[-1] == 'e':
-            successes += scion_epic_successes(int(arg[:-1]))
+            successes += _scion_epic_successes(int(arg[:-1]))
         else:
             num_dice += int(arg)
     results = []
@@ -80,17 +77,17 @@ async def scion(message):
             successes += 1
         results.append(result)
     await shared.bot.send_message(message.channel,
-                           scion_result_message(successes, results))
+                           _scion_result_message(successes, results))
 
-## Helper Functions
-def scion_epic_successes(epic_attr_value):
-    '''
+
+def _scion_epic_successes(epic_attr_value):
+    """
     Calculates the number of automatic successes a Scion gets for a given number
     of Epic Attribute dots.
     
     epic_attr_value (int):
         The number of dots the Scion has in an Epic Attribute.
-    '''
+    """
     if epic_attr_value == 0:
         return 0
     epic_successes = 1
@@ -98,8 +95,9 @@ def scion_epic_successes(epic_attr_value):
         epic_successes += i
     return epic_successes
 
-def scion_result_message(successes, results):
-    '''
+
+def _scion_result_message(successes, results):
+    """
     Formats a message for Scion roll results.
     
     successes (int):
@@ -107,7 +105,7 @@ def scion_result_message(successes, results):
     
     results (list(int)):
         The values rolled.
-    '''
+    """
     results.sort()
     firstResult = results[0] if len(results) else 0
     for i, item in enumerate(results):
