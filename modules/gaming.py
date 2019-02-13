@@ -28,7 +28,7 @@ async def roll(message):
     die_size = int(split[1])
     results = []
     for i in range(int(split[0])):
-        results.append(random.randint(1,die_size))
+        results.append(random.randint(1, die_size))
     results.sort()
     for i, item in enumerate(results):
         results[i] = str(item)
@@ -77,7 +77,7 @@ async def scion(message):
             successes += 1
         results.append(result)
     await shared.bot.send_message(message.channel,
-                           _scion_result_message(successes, results))
+                                  _scion_result_message(successes, results))
 
 
 def _scion_epic_successes(epic_attr_value):
@@ -107,13 +107,13 @@ def _scion_result_message(successes, results):
         The values rolled.
     """
     results.sort()
-    firstResult = results[0] if len(results) else 0
+    first_result = results[0] if len(results) else 0
     for i, item in enumerate(results):
         results[i] = str(item)
     message = ' + '.join(results)
-    if firstResult == 0:
+    if first_result == 0:
         message = 'Got ' + str(successes) + ' successes without even trying.'
-    elif successes == 0 and firstResult == 1:
+    elif successes == 0 and first_result == 1:
         message = 'A botch! ' + message
     else:
         message = str(successes) + ' successes! ' + message
