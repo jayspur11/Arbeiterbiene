@@ -3,19 +3,14 @@ setup of the bot, as well as pulling in and configuring all the modules.
 """
 
 from discord.ext import commands
+from modules import core
+from modules import gaming
+from modules import module
 from modules import shared
 import json
 import logging
 
 shared.bot = commands.Bot(('BOT! ', '!'))
-
-"""
-How To Module:
-Import the module from `modules`. Then add it to the `module_registry` dict,
-with its trigger character as the key.
-"""
-from modules import core
-from modules import gaming
 
 shared.module_registry = {
     '!': core,
@@ -30,9 +25,8 @@ async def on_ready():
 
 @shared.bot.event
 async def on_message(message):
-    trigger = message.content[0]
-    if trigger in shared.module_registry:
-        await shared.module_registry[trigger].process_message(message)
+    if message.channel.is_private or shared.bot.user.id in message.raw_mentions:
+        await module.process_message(message)
 
 
 def _configure_file_logging():

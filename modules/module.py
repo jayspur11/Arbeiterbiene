@@ -45,16 +45,16 @@ def module_command(func):
 async def process_message(message):
     """
     Coroutine to process an incoming command for this module.
-    
+
     message (discord.Message):
         The message received from the server.
     """
-    content = message.content.split(' ', 1)
-    cmd = content[0][1:]
+    content = message.content.split(' ', 2)
+    cmd = content[1]
     if cmd in module_commands:
         func = module_commands[cmd]
         try:
-            message.content = content[1] if len(content) > 1 else ''
+            message.content = content[2] if len(content) > 2 else ''
             await func(message)
         except (IndexError, ValueError):
             await shared.bot.send_message(message.channel, func.__doc__)
