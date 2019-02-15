@@ -9,12 +9,11 @@ A command does *not* belong here if it...
  - is a picture of Hitler.
 """
 
-from modules.module import *
+from modules import module
+from modules import shared
 
-module_name = 'Core'
 
-
-@module_command
+@module.module_command
 async def die(message):
     """```die```
     Logs the bot out & kills the running process.
@@ -24,11 +23,11 @@ async def die(message):
 
 
 # TODO: Fix this one so it's not so dangerous.
-# @module_command
+# @module.module_command
 async def echo(message):
     """```echo <msg>```
     Echoes the given message (`<msg>`) back to the server.
-    
+
     **Notes:**
         Be careful with this one! Anyone can ask the bot to say *anything*,
         which is dangerous, because the bot might execute elevated commands.
@@ -38,19 +37,19 @@ async def echo(message):
     await shared.bot.send_message(message.channel, message.content)
 
 
-@module_command
+@module.module_command
 async def garble(message):
     """```garble <msg>```
     Garbles the given message (`<msg>`) and echoes it back to the server.
     Also deletes the message that triggered the bot (but mentions the original
     sender).
-    
+
     **Notes:**
      - This is a best-effort deal...if you see a `!garble` come in from
        someone, *don't read their message*!
      - On the same note, if you notice the bot doesn't garble your message, be
        kind and delete it.
-    
+
     **See Also:** `ungarble`
     """
     if not len(message.content):
@@ -61,7 +60,7 @@ async def garble(message):
         message.author.mention + ' ' + _transform(message.content))
 
 
-@module_command
+@module.module_command
 async def help(message):
     """```help [<command>]```
     Prints a help message.
@@ -73,13 +72,13 @@ async def help(message):
     docs = []
     if not len(message.content):
         docs += list('Available commands:')
-        for command in module_commands:
+        for command in module.module_commands:
             docs += list(' ' + command + ',')
         docs[-1] = '.'
     await shared.bot.send_message(message.author, ''.join(docs))
 
 
-@module_command
+@module.module_command
 async def ungarble(message):
     """```ungarble <msg>```
     Ungarbles the given message (`<msg>`) and PMs it back to the sender. Also

@@ -9,13 +9,12 @@ A command does *not* belong here if it...
  - is a picture of Hitler.
 """
 
-from modules.module import *
+from modules import module
+from modules import shared
 import random
 
-module_name = 'Gaming'
 
-
-@module_command
+@module.module_command
 async def roll(message):
     """```roll XdY```
     Rolls dice and sends the ordered results to where the command came from.
@@ -35,7 +34,7 @@ async def roll(message):
     await shared.bot.send_message(message.channel, ' + '.join(results))
 
 
-@module_command
+@module.module_command
 async def scion(message):
     """```scion X e# s#```
     Rolls dice according to White Wolf's *Scion* rules and sends the result to
