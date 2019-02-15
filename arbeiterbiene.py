@@ -10,12 +10,7 @@ from modules import shared
 import json
 import logging
 
-shared.bot = commands.Bot(('BOT! ', '!'))
-
-shared.module_registry = {
-    '!': core,
-    '$': gaming,
-}
+shared.bot = commands.Bot(None)
 
 
 @shared.bot.event

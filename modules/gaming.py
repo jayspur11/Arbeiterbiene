@@ -17,7 +17,7 @@ module_name = 'Gaming'
 
 @module_command
 async def roll(message):
-    """```$roll XdY```
+    """```roll XdY```
     Rolls dice and sends the ordered results to where the command came from.
     
     `X` is the number of dice to roll, and `Y` is the number of sides.
@@ -37,7 +37,7 @@ async def roll(message):
 
 @module_command
 async def scion(message):
-    """```$scion X e# s#```
+    """```scion X e# s#```
     Rolls dice according to White Wolf's *Scion* rules and sends the result to
     where the command came from.
     
