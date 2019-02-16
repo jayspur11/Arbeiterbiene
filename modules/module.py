@@ -11,10 +11,8 @@ commands to the module via `module.process_message`.
 
 from modules import shared
 
-# Module Setup
-# To be filled in by the inheriting module.
+
 module_commands = {}
-module_name = ''
 
 
 def module_command(func):
@@ -44,7 +42,7 @@ def module_command(func):
 
 async def process_message(message):
     """
-    Coroutine to process an incoming command for this module.
+    Coroutine to process an incoming command.
 
     message (discord.Message):
         The message received from the server.

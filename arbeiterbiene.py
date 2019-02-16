@@ -11,6 +11,8 @@ import json
 import logging
 
 shared.bot = commands.Bot(None)
+core.register_commands()
+gaming.register_commands()
 
 
 @shared.bot.event
