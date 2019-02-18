@@ -1,48 +1,35 @@
-'''
-# arbeiterbiene.py
-
-This is the main file for the Discord bot. It's responsible for the primary
+""" This is the main file for the Discord bot. It's responsible for the primary
 setup of the bot, as well as pulling in and configuring all the modules.
-'''
+"""
 
 from discord.ext import commands
+from modules import core
+from modules import gaming
+from modules import module
 from modules import shared
-import asyncio
 import json
 import logging
 
-shared.bot = commands.Bot(('BOT! ', '!'))
+shared.bot = commands.Bot(None)
+core.register_commands()
+gaming.register_commands()
 
-## Module Setup
-'''
-How To Module:
-Import the module from `modules`. Then add it to the `module_registry` dict,
-with its trigger character as the key.
-'''
-from modules import core
-from modules import gaming
 
-shared.module_registry = {
-    '!': core,
-    '$': gaming,
-}
-
-## Bot Events
 @shared.bot.event
 async def on_ready():
     print("Hello world!")
 
+
 @shared.bot.event
 async def on_message(message):
-    trigger = message.content[0]
-    if trigger in shared.module_registry:
-        await shared.module_registry[trigger].process_message(message)
+    if message.channel.is_private or shared.bot.user.id in message.raw_mentions:
+        await module.process_message(message)
 
-## Misc Functions
-def _configureFileLogging():
-    '''
+
+def _configure_file_logging():
+    """
     Configures the logging module to output logs to file ('discord.log').
-    '''
+    """
     handler = logging.FileHandler(filename='discord.log', encoding='utf-8',
                                   mode='w')
     handler.setFormatter(
@@ -54,10 +41,10 @@ def _configureFileLogging():
 
 
 def main():
-    '''
+    """
     The entry point of the Arbeiterbiene bot.
-    '''
-    _configureFileLogging()
+    """
+    _configure_file_logging()
     try:
         with open('auth.json', 'r') as authfile:
             auth = json.load(authfile)
@@ -69,5 +56,5 @@ def main():
     shared.bot.run(auth['token'])
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     main()
