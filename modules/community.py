@@ -22,25 +22,35 @@ def register_commands():
         **The quotes are important!**
         """
         # parse answers
+        answer_list = []
+        segments = message.content.split('" ')
+        for answer in segments[1:]:
+            if '"' not in answer:
+                # TODO: handle time limit
+                break
+            answer_list.append(_parse_poll_answer(answer.strip('"')))
         # construct poll
         # echo to server
         # add reactions
         # TODO: eventually count the results
 
 
-def _extract_poll_emoji(sanswer, server):
+def _parse_poll_answer(sanswer, server):
     """ Parses a poll answer (<string> <emoji>) for its emoji.
 
     :param sanswer: (string) String containing a poll answer and corresponding
         emoji.
     :param server: (discord.Server) Server to check for custom Emoji.
-    :return: (?) Either a discord.Emoji object (for custom emoji), a string (for
-        unicode emoji), or None (for an invalid string).
+    :return: (tuple) A tuple containing a string respresenting the option, and
+        either a discord.Emoji object (for custom emoji) or a string (for
+        unicode emoji) representing the emoji reaction.
+
+    :raises ValueError if the answer string is invalid.
     """
     # TODO: check string validity
-    emoji = sanswer.rsplit(' ', 1)[-1]
+    answer, emoji = sanswer.rsplit(' ', 1)[-1]
     if ':' in emoji:
         # emoji are formatted like '<:name:id>' and we want 'id'
         emoji_id = emoji.split(':')[-1][:-1]
         emoji = shared.get_emoji_by_id(emoji_id, server)
-    return emoji
+    return answer, emoji
