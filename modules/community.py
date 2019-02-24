@@ -21,17 +21,26 @@ def register_commands():
         Answers should end with an emoji, so users can vote with a reaction.
         **The quotes are important!**
         """
-        # parse answers
         answer_list = []
         segments = message.content.split('" ')
         for answer in segments[1:]:
             if '"' not in answer:
                 # TODO: handle time limit
                 break
-            answer_list.append(_parse_poll_answer(answer.strip('"')))
-        # construct poll
-        # echo to server
-        # add reactions
+            answer_list.append(_parse_poll_answer(answer.strip('"'),
+                                                  message.server))
+
+        poll_content = "Hey @everyone! {op} would like to know:\n{q}".format(
+            op=message.author.mention, q=segments[0][1:])
+        for option, emoji in answer_list:
+            poll_content = "{prev}\n{emoji} for {option}".format(
+                prev=poll_content, emoji=emoji, option=option)
+        poll_message = await shared.bot.send_message(message.channel,
+                                                     poll_content)
+
+        for _, emoji in answer_list:
+            await shared.bot.add_reaction(poll_message, emoji)
+
         # TODO: eventually count the results
 
 
@@ -48,7 +57,7 @@ def _parse_poll_answer(sanswer, server):
     :raises ValueError if the answer string is invalid.
     """
     # TODO: check string validity
-    answer, emoji = sanswer.rsplit(' ', 1)[-1]
+    answer, emoji = sanswer.rsplit(' ', 1)
     if ':' in emoji:
         # emoji are formatted like '<:name:id>' and we want 'id'
         emoji_id = emoji.split(':')[-1][:-1]
