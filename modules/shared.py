@@ -1,4 +1,6 @@
 import heapq
+import threading
+from datetime import datetime
 
 bot = None
 _future_activities = []  # TODO: make sure this survives outages
@@ -57,3 +59,13 @@ def schedule_activity(atime, activity):
     """
     heapq.heappush(_future_activities, [atime, activity])
     # We will probably need a way to find scheduled activities, to cancel them.
+
+
+def perform_scheduled_activities():
+    """ Run any activities that have been scheduled to run by now. """
+    # TODO: handle duplicate calls (though this shouldn't happen)
+    tsnow = datetime.now().timestamp()
+    while _future_activities and _future_activities[0][0] < tsnow:
+        heapq.heappop(_future_activities)[1]()
+
+    threading.Timer(60, perform_scheduled_activities()).start()

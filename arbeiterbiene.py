@@ -56,6 +56,7 @@ def main():
               '.json".')
         return
     shared.bot.run(auth['token'])
+    shared.perform_scheduled_activities()
 
 
 if __name__ == '__main__':
