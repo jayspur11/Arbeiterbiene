@@ -7,6 +7,7 @@ A command does *not* belong here if it...
  - is an introvert.
 """
 
+from datetime import datetime
 from modules import module
 from modules import shared
 
@@ -22,10 +23,13 @@ def register_commands():
         **The quotes are important!**
         """
         answer_list = []
+        poll_duration = 86400  # default, 24h
         segments = message.content.split('" ')
         for answer in segments[1:]:
             if '"' not in answer:
-                # TODO: handle time limit
+                poll_duration = shared.parse_duration(answer)
+                if not poll_duration:
+                    raise ValueError
                 break
             answer_list.append(_parse_poll_answer(answer.strip('"'),
                                                   message.server))
@@ -41,7 +45,11 @@ def register_commands():
         for _, emoji in answer_list:
             await shared.bot.add_reaction(poll_message, emoji)
 
-        # TODO: eventually count the results
+        def tally_votes():
+            # TODO: count and notify
+            pass
+        poll_end_time = int(datetime.now().timestamp()) + poll_duration
+        shared.schedule_activity(poll_end_time, tally_votes)
 
 
 def _parse_poll_answer(sanswer, server):

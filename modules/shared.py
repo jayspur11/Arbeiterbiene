@@ -1,4 +1,7 @@
+import heapq
+
 bot = None
+_future_activities = []  # TODO: make sure this survives outages
 
 
 def get_emoji_by_id(sid, server):
@@ -15,6 +18,7 @@ def get_emoji_by_id(sid, server):
     return None
 
 
+# TODO: we should do a much better job of handling 'time'
 def parse_duration(sduration):
     """ Parses a duration specifier ([#d][#h][#m]) into seconds.
 
@@ -43,3 +47,13 @@ def parse_duration(sduration):
         return None
 
     return duration_seconds
+
+
+def schedule_activity(atime, activity):
+    """ Schedule something to happen in the future.
+
+    :param atime: Time the activity should happen (Unix epoch).
+    :param activity: Function to call at the given time.
+    """
+    heapq.heappush(_future_activities, [atime, activity])
+    # We will probably need a way to find scheduled activities, to cancel them.
