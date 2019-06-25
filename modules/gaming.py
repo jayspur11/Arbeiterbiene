@@ -12,28 +12,21 @@ A command does *not* belong here if it...
 from modules import module
 from modules import shared
 import random
+import re
 
 
 def register_commands():
     @module.module_command
     async def roll(message):
         """```roll XdY```
-        Rolls dice and sends the ordered results to where the command came from.
+        Rolls dice and sends the result to where the command came from.
 
         `X` is the number of dice to roll, and `Y` is the number of sides.
         """
-        message = ''.join(message.split())
         if not len(message.content):
             raise ValueError
-        split = message.content.split('d', 1)
-        die_size = int(split[1])
-        results = []
-        for i in range(int(split[0])):
-            results.append(random.randint(1, die_size))
-        results.sort()
-        for i, item in enumerate(results):
-            results[i] = str(item)
-        await shared.bot.send_message(message.channel, ' + '.join(results))
+        await shared.bot.send_message(
+            message.channel, str(_roll(''.join(message.content.split()))[0]))
 
     @module.module_command
     async def scion(message):
@@ -80,18 +73,59 @@ def register_commands():
                                       _scion_result_message(successes, results))
 
 
-def _roll_segment(segment):
-    """
-    Calculates the preliminary results of a roll.
+def _add(val1, val2):
+    return val1 + val2
 
-    segment (string):
-        The part of the roll command to calculate.
+
+def _sub(val1, val2):
+    return val1 - val2
+
+
+def _roll_dice(num, sides):
+    result = 0
+    for i in range(num):
+        result += random.randint(1, sides)
+    return result
+
+
+op_priority = {'d': 2, '+': 1, '-': 1}
+op_function = {'d': _roll_dice, '+': _add, '-': _sub}
+
+
+def _roll(command):
     """
-    # walk from left to right
-    # push operators onto one stack, values onto another
-    # resolve higher-pri operators when pushing new ones
-    # parentheses are a special case; recurse on them.
-    # how can we keep track of the different parts of a roll?
+    Calculates the results of a roll.
+
+    command (string):
+        The roll command to calculate.
+
+    Returns: int, string - the resulting value, and the remaining command.
+    """
+    op_stack = []
+    val_stack = []
+    while command:
+        val_match = re.match(r'\d+', command)
+        if val_match:
+            val_stack.append(int(val_match.group()))
+            command = command[val_match.end():]
+        elif command[0] in '+-d':
+            op = command[0]
+            cur_pri = op_priority[op]
+            while op_stack and op_priority[op_stack[-1]] > cur_pri:
+                val2, val1 = val_stack.pop(), val_stack.pop()
+                val_stack.append(op_function[op_stack.pop()](val1, val2))
+            op_stack.append(op)
+            command = command[1:]
+        elif command[0] == '(':
+            inner_res, command = _roll(command[1:])
+            val_stack.append(inner_res)
+        elif command[0] == ')':
+            command = command[1:]
+            break
+    while op_stack:
+        val2, val1 = val_stack.pop(), val_stack.pop()
+        val_stack.append(op_function[op_stack.pop()](val1, val2))
+    return val_stack[0], command
 
 
 def _scion_epic_successes(epic_attr_value):
