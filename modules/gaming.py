@@ -22,6 +22,7 @@ def register_commands():
 
         `X` is the number of dice to roll, and `Y` is the number of sides.
         """
+        message = ''.join(message.split())
         if not len(message.content):
             raise ValueError
         split = message.content.split('d', 1)
@@ -77,6 +78,20 @@ def register_commands():
             results.append(result)
         await shared.bot.send_message(message.channel,
                                       _scion_result_message(successes, results))
+
+
+def _roll_segment(segment):
+    """
+    Calculates the preliminary results of a roll.
+
+    segment (string):
+        The part of the roll command to calculate.
+    """
+    # walk from left to right
+    # push operators onto one stack, values onto another
+    # resolve higher-pri operators when pushing new ones
+    # parentheses are a special case; recurse on them.
+    # how can we keep track of the different parts of a roll?
 
 
 def _scion_epic_successes(epic_attr_value):
