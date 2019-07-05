@@ -126,8 +126,8 @@ def _parse_arg(command):
     """
     cmd0 = command[0]
     if cmd0 == "(":
-        # todo: break out subroll
-        pass
+        subroll, command = _break_out_subroll(command)
+        arg = "({})".format(_parse_roll(subroll))
     elif cmd0 == "[":
         # todo: break out table
         pass
@@ -136,6 +136,31 @@ def _parse_arg(command):
         arg = match.group()
         command = command[match.end():]
     return arg, command
+
+
+def _break_out_subroll(command):
+    """
+    Parses a roll command for the next full parenthesized block.
+
+    command (string):
+        The command to break out of. (e.g. "(1d2)d20")
+
+    Returns: string, string - the parenthesized segment, and the remainder of the command. (e.g. "1d2", "d20")
+    """
+    unresolved = 1
+    next_closed = command.find(')')
+    next_open = command.find('(', 1)
+    # (0  (1  (2  )3  )4  (5  )6  )7
+    while True:
+        if next_open == -1 or next_open > next_closed:
+            unresolved -= 1
+            if not unresolved:
+                break
+            next_closed = command.find(')', next_closed+1)
+        else:
+            unresolved += 1
+            next_open = command.find('(', next_open+1)
+    return command[1:next_closed], command[next_closed+1:]
 
 
 def _scion_epic_successes(epic_attr_value):
