@@ -25,8 +25,10 @@ def register_commands():
         """
         if not len(message.content):
             raise ValueError
+        roll_cmd = _parse_roll(message.content)
+        # todo: sanitize input
         await shared.bot.send_message(
-            message.channel, str(_roll(''.join(message.content.split()))[0]))
+            message.channel, str(eval(roll_cmd)))
 
     @module.module_command
     async def scion(message):
@@ -73,14 +75,6 @@ def register_commands():
                                       _scion_result_message(successes, results))
 
 
-def _add(val1, val2):
-    return val1 + val2
-
-
-def _sub(val1, val2):
-    return val1 - val2
-
-
 def _roll_dice(num, sides):
     result = 0
     for i in range(num):
@@ -88,44 +82,60 @@ def _roll_dice(num, sides):
     return result
 
 
-op_priority = {'d': 2, '+': 1, '-': 1}
-op_function = {'d': _roll_dice, '+': _add, '-': _sub}
-
-
-def _roll(command):
+def _parse_roll(command):
     """
-    Calculates the results of a roll.
+    Parses a roll command into an interpretable equation.
 
     command (string):
-        The roll command to calculate.
+        The roll command to translate (e.g. "1d20+1d6").
 
-    Returns: int, string - the resulting value, and the remaining command.
+    Returns: string - the resulting Pythonic equation (e.g. "_roll(1,20)+_roll(1,6)").
+
+    Raises: ValueError if the string couldn't be parsed, including a message about the offending format.
+    TODO(jaysen): is ValErr the right thing to raise here?
     """
-    op_stack = []
-    val_stack = []
+    arg_stack = []
+    result = []
     while command:
-        val_match = re.match(r'\d+', command)
-        if val_match:
-            val_stack.append(int(val_match.group()))
-            command = command[val_match.end():]
-        elif command[0] in '+-d':
-            op = command[0]
-            cur_pri = op_priority[op]
-            while op_stack and op_priority[op_stack[-1]] > cur_pri:
-                val2, val1 = val_stack.pop(), val_stack.pop()
-                val_stack.append(op_function[op_stack.pop()](val1, val2))
-            op_stack.append(op)
+        cmd0 = command[0]
+        if cmd0 == 'd':
+            arg, command = _parse_arg(command[1:])
+            result.append("_roll_dice({}, {})".format(arg_stack.pop(), arg))
+        elif cmd0 in "+-":
+            result.append(cmd0)
             command = command[1:]
-        elif command[0] == '(':
-            inner_res, command = _roll(command[1:])
-            val_stack.append(inner_res)
-        elif command[0] == ')':
-            command = command[1:]
-            break
-    while op_stack:
-        val2, val1 = val_stack.pop(), val_stack.pop()
-        val_stack.append(op_function[op_stack.pop()](val1, val2))
-    return val_stack[0], command
+        else:
+            arg, command = _parse_arg(command)
+            arg_stack.append(arg)
+    if arg_stack:
+        result.append(arg_stack.pop())
+    return ''.join(result)
+
+
+_num_re = re.compile(r'\d+')
+
+
+def _parse_arg(command):
+    """
+    Parses a roll command for the next argument block.
+
+    command (string):
+        The command to parse. (e.g. "2d6")
+
+    Returns: string, string - the next arg, and the remainder of the command. (e.g. "2", "d6")
+    """
+    cmd0 = command[0]
+    if cmd0 == "(":
+        # todo: break out subroll
+        pass
+    elif cmd0 == "[":
+        # todo: break out table
+        pass
+    else:
+        match = _num_re.match(command)
+        arg = match.group()
+        command = command[match.end():]
+    return arg, command
 
 
 def _scion_epic_successes(epic_attr_value):
