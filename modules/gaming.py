@@ -82,6 +82,15 @@ def _roll_dice(num, sides):
     return result
 
 
+def _roll_table(num, table):
+    results = []
+    highest = len(table) - 1
+    for i in range(num):
+        results.append(table[random.randint(0, highest)])
+    # TODO: sanitize output
+    return ' + '.join(results)
+
+
 def _parse_roll(command):
     """
     Parses a roll command into an interpretable equation.
@@ -100,13 +109,18 @@ def _parse_roll(command):
         cmd0 = command[0]
         if cmd0 == 'd':
             arg, command = _parse_arg(command[1:])
-            result.append("_roll_dice({}, {})".format(arg_stack.pop(), arg))
+            if arg[0] == '[':
+                func = "_roll_table"
+            else:
+                func = "_roll_dice"
+            result.append("{}({}, {})".format(func, arg_stack.pop(), arg))
         elif cmd0 in "+-":
             result.append(cmd0)
             command = command[1:]
         else:
             arg, command = _parse_arg(command)
             arg_stack.append(arg)
+        command = command.strip()
     if arg_stack:
         result.append(arg_stack.pop())
     return ''.join(result)
@@ -126,11 +140,10 @@ def _parse_arg(command):
     """
     cmd0 = command[0]
     if cmd0 == "(":
-        subroll, command = _break_out_subroll(command)
+        subroll, command = _extract_contents(command, '(', ')')
         arg = "({})".format(_parse_roll(subroll))
     elif cmd0 == "[":
-        # todo: break out table
-        pass
+        arg, command = _break_out_table(command)
     else:
         match = _num_re.match(command)
         arg = match.group()
@@ -138,29 +151,51 @@ def _parse_arg(command):
     return arg, command
 
 
-def _break_out_subroll(command):
+def _extract_contents(command, opener, closer):
     """
-    Parses a roll command for the next full parenthesized block.
+    Parses a command string for the next fully-enclosed block, based on the given delimiters.
 
     command (string):
-        The command to break out of. (e.g. "(1d2)d20")
+        The command to pull a block from. E.g. "(1d2)d20"
 
-    Returns: string, string - the parenthesized segment, and the remainder of the command. (e.g. "1d2", "d20")
+    opener (string):
+        The opening delimiter. E.g. "("
+
+    closer (string):
+        The closing delimiter. E.g. ")"
+
+    Returns: string, string - the enclosed block, and the remainder of the command. E.g. "1d2","d20"
     """
     unresolved = 1
-    next_closed = command.find(')')
-    next_open = command.find('(', 1)
-    # (0  (1  (2  )3  )4  (5  )6  )7
+    next_closed = command.find(closer)
+    next_open = command.find(opener, 1)
     while True:
         if next_open == -1 or next_open > next_closed:
             unresolved -= 1
             if not unresolved:
                 break
-            next_closed = command.find(')', next_closed+1)
+            next_closed = command.find(closer, next_closed+1)
         else:
             unresolved += 1
-            next_open = command.find('(', next_open+1)
+            next_open = command.find(opener, next_open+1)
     return command[1:next_closed], command[next_closed+1:]
+
+
+_comma_re = re.compile(r',\s*')
+
+
+def _break_out_table(command):
+    """
+    Parses a roll command for the next fully-bracketed table.
+
+    command (string):
+        The command to break out of. (e.g. "[hi, hello]")
+
+    Returns: string, string - the interpretable table, and the remainder of the command. (e.g. "['hi','hello']", "")
+    """
+    table_string, command = _extract_contents(command, '[', ']')
+    table = _comma_re.sub("','", table_string)
+    return "['{}']".format(table), command
 
 
 def _scion_epic_successes(epic_attr_value):
