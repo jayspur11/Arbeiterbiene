@@ -15,6 +15,9 @@ import random
 import re
 
 
+_numeric_equation_re = re.compile(r'[()+\-\s\d]*')
+
+
 def register_commands():
     @module.module_command
     async def roll(message):
@@ -26,7 +29,10 @@ def register_commands():
         if not len(message.content):
             raise ValueError
         roll_cmd = _parse_roll(message.content)
-        result_string = "**{}**\n{}".format(str(eval(roll_cmd)), roll_cmd)
+        if _numeric_equation_re.fullmatch(roll_cmd):
+            result_string = "**{}**\n{}".format(str(eval(roll_cmd)), roll_cmd)
+        else:
+            result_string = roll_cmd
         await shared.bot.send_message(
             message.channel, result_string)
 
@@ -113,8 +119,10 @@ def _parse_roll(command):
                 func = "_roll_table"
             else:
                 func = "_roll_dice"
-            result.append(str(eval("{}({}, {})".format(
-                func, arg_stack.pop(), arg))))
+            args = "({}, {})".format(arg_stack.pop(), arg)
+            if not _numeric_equation_re.fullmatch(args):
+                raise ValueError
+            result.append(str(eval("{}{}".format(func, args))))
         elif cmd0 in "+-":
             result.append(cmd0)
             command = command[1:]
