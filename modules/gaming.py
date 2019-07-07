@@ -194,8 +194,8 @@ def _break_out_table(command):
     Returns: string, string - the interpretable table, and the remainder of the command. (e.g. "['hi','hello']", "")
     """
     table_string, command = _extract_contents(command, '[', ']')
-    table = _comma_re.sub("','", table_string)
-    return "['{}']".format(table), command
+    table = _comma_re.sub('","', table_string.replace('"', ''))  # anti-inject
+    return '["{}"]'.format(table), command
 
 
 def _scion_epic_successes(epic_attr_value):
