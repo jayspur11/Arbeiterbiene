@@ -26,9 +26,9 @@ def register_commands():
         if not len(message.content):
             raise ValueError
         roll_cmd = _parse_roll(message.content)
-        # todo: sanitize input
+        result_string = "**{}**\n{}".format(str(eval(roll_cmd)), roll_cmd)
         await shared.bot.send_message(
-            message.channel, str(eval(roll_cmd)))
+            message.channel, result_string)
 
     @module.module_command
     async def scion(message):
@@ -76,10 +76,10 @@ def register_commands():
 
 
 def _roll_dice(num, sides):
-    result = 0
+    results = []
     for i in range(num):
-        result += random.randint(1, sides)
-    return result
+        results.append(str(random.randint(1, sides)))
+    return '({})'.format(' + '.join(results))
 
 
 def _roll_table(num, table):
@@ -113,7 +113,8 @@ def _parse_roll(command):
                 func = "_roll_table"
             else:
                 func = "_roll_dice"
-            result.append("{}({}, {})".format(func, arg_stack.pop(), arg))
+            result.append(str(eval("{}({}, {})".format(
+                func, arg_stack.pop(), arg))))
         elif cmd0 in "+-":
             result.append(cmd0)
             command = command[1:]
