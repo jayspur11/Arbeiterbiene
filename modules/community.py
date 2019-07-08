@@ -9,7 +9,6 @@ A command does *not* belong here if it...
 
 import emoji
 import re
-from datetime import datetime
 from modules import module
 from modules import shared
 
@@ -45,9 +44,3 @@ def register_commands():
             await shared.bot.add_reaction(poll_message, emojus)
         for emojus_match in emoji.get_emoji_regexp().finditer(message.content):
             await shared.bot.add_reaction(poll_message, emojus_match.group())
-
-        # def tally_votes():
-        #     # TODO: count and notify
-        #     pass
-        # poll_end_time = int(datetime.now().timestamp()) + poll_duration
-        # shared.schedule_activity(poll_end_time, tally_votes)
