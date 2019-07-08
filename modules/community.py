@@ -25,15 +25,23 @@ def register_commands():
         ...
         <answer N> <emojus>```
         Echoes the poll back to the server and adds the emoji as reactions.
+
+        Note: The bot is, sadly, unable to handle emoji from other servers.
         """
+        custom_emoji_matches = _server_emoji_re.findall(message.content)
+        server = message.server
+        custom_emoji = []
+        for emojus_match in custom_emoji_matches:
+            emojus = shared.get_emoji_by_id(emojus_match.group(1), server)
+            if not emojus:
+                raise ValueError
+            custom_emoji.append(emojus)
         poll_content = "Hey everyone! {op} would like to know:\n{q}".format(
             op=message.author.mention, q=message.content)
         poll_message = await shared.bot.send_message(message.channel,
                                                      poll_content)
 
-        server = message.server
-        for emojus_match in _server_emoji_re.finditer(message.content):
-            emojus = shared.get_emoji_by_id(emojus_match.group(1), server)
+        for emojus in custom_emoji:
             await shared.bot.add_reaction(poll_message, emojus)
         for emojus_match in emoji.get_emoji_regexp().finditer(message.content):
             await shared.bot.add_reaction(poll_message, emojus_match.group())
