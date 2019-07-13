@@ -12,27 +12,29 @@ A command does *not* belong here if it...
 from modules import module
 from modules import shared
 import random
+import re
+
+
+_numeric_equation_re = re.compile(r'[()+\-\s\d]*')
 
 
 def register_commands():
     @module.module_command
     async def roll(message):
         """```roll XdY```
-        Rolls dice and sends the ordered results to where the command came from.
+        Rolls dice and sends the result to where the command came from.
 
         `X` is the number of dice to roll, and `Y` is the number of sides.
         """
         if not len(message.content):
             raise ValueError
-        split = message.content.split('d', 1)
-        die_size = int(split[1])
-        results = []
-        for i in range(int(split[0])):
-            results.append(random.randint(1, die_size))
-        results.sort()
-        for i, item in enumerate(results):
-            results[i] = str(item)
-        await shared.bot.send_message(message.channel, ' + '.join(results))
+        roll_cmd = _parse_roll(message.content)
+        if _numeric_equation_re.fullmatch(roll_cmd):
+            result_string = "**{}**\n{}".format(str(eval(roll_cmd)), roll_cmd)
+        else:
+            result_string = roll_cmd
+        await shared.bot.send_message(
+            message.channel, result_string)
 
     @module.module_command
     async def scion(message):
@@ -77,6 +79,132 @@ def register_commands():
             results.append(result)
         await shared.bot.send_message(message.channel,
                                       _scion_result_message(successes, results))
+
+
+def _roll_dice(num, sides):
+    results = []
+    for i in range(num):
+        results.append(str(random.randint(1, sides)))
+    return '({})'.format(' + '.join(results))
+
+
+def _roll_table(num, table):
+    results = []
+    highest = len(table) - 1
+    for i in range(num):
+        results.append(table[random.randint(0, highest)])
+    # TODO: sanitize output
+    return ' + '.join(results)
+
+
+def _parse_roll(command):
+    """
+    Parses a roll command into an interpretable equation.
+
+    command (string):
+        The roll command to translate (e.g. "1d20+1d6").
+
+    Returns: string - the resulting Pythonic equation (e.g. "_roll(1,20)+_roll(1,6)").
+
+    Raises: ValueError if the string couldn't be parsed, including a message about the offending format.
+    TODO(jaysen): is ValErr the right thing to raise here?
+    """
+    arg_stack = []
+    result = []
+    while command:
+        cmd0 = command[0]
+        if cmd0 == 'd':
+            arg, command = _parse_arg(command[1:])
+            if arg[0] == '[':
+                func = "_roll_table"
+            else:
+                func = "_roll_dice"
+            args = "({}, {})".format(arg_stack.pop(), arg)
+            if not _numeric_equation_re.fullmatch(args):
+                raise ValueError
+            result.append(str(eval("{}{}".format(func, args))))
+        elif cmd0 in "+-":
+            result.append(cmd0)
+            command = command[1:]
+        else:
+            arg, command = _parse_arg(command)
+            arg_stack.append(arg)
+        command = command.strip()
+    if arg_stack:
+        result.append(arg_stack.pop())
+    return ''.join(result)
+
+
+_num_re = re.compile(r'\d+')
+
+
+def _parse_arg(command):
+    """
+    Parses a roll command for the next argument block.
+
+    command (string):
+        The command to parse. (e.g. "2d6")
+
+    Returns: string, string - the next arg, and the remainder of the command. (e.g. "2", "d6")
+    """
+    cmd0 = command[0]
+    if cmd0 == "(":
+        subroll, command = _extract_contents(command, '(', ')')
+        arg = "({})".format(_parse_roll(subroll))
+    elif cmd0 == "[":
+        arg, command = _break_out_table(command)
+    else:
+        match = _num_re.match(command)
+        arg = match.group()
+        command = command[match.end():]
+    return arg, command
+
+
+def _extract_contents(command, opener, closer):
+    """
+    Parses a command string for the next fully-enclosed block, based on the given delimiters.
+
+    command (string):
+        The command to pull a block from. E.g. "(1d2)d20"
+
+    opener (string):
+        The opening delimiter. E.g. "("
+
+    closer (string):
+        The closing delimiter. E.g. ")"
+
+    Returns: string, string - the enclosed block, and the remainder of the command. E.g. "1d2","d20"
+    """
+    unresolved = 1
+    next_closed = command.find(closer)
+    next_open = command.find(opener, 1)
+    while True:
+        if next_open == -1 or next_open > next_closed:
+            unresolved -= 1
+            if not unresolved:
+                break
+            next_closed = command.find(closer, next_closed+1)
+        else:
+            unresolved += 1
+            next_open = command.find(opener, next_open+1)
+    return command[1:next_closed], command[next_closed+1:]
+
+
+_comma_re = re.compile(r',\s*')
+
+
+def _break_out_table(command):
+    """
+    Parses a roll command for the next fully-bracketed table.
+
+    command (string):
+        The command to break out of. (e.g. "[hi, hello]")
+
+    Returns: string, string - the interpretable table, and the remainder of the command. (e.g. "['hi','hello']", "")
+    """
+    table_string, command = _extract_contents(command, '[', ']')
+    table = _comma_re.sub('","', table_string.replace('"', ''))  # anti-inject
+    return '["{}"]'.format(table), command
 
 
 def _scion_epic_successes(epic_attr_value):
