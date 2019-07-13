@@ -119,10 +119,11 @@ def _parse_roll(command):
                 func = "_roll_table"
             else:
                 func = "_roll_dice"
-            args = "({}, {})".format(arg_stack.pop(), arg)
-            if not _numeric_equation_re.fullmatch(args):
+            arg1 = arg_stack.pop()
+            if not (_numeric_equation_re.fullmatch(arg1) and
+                    _numeric_equation_re.fullmatch(arg)):
                 raise ValueError
-            result.append(str(eval("{}{}".format(func, args))))
+            result.append(str(eval("{}({}, {})".format(func, arg1, arg))))
         elif cmd0 in "+-":
             result.append(cmd0)
             command = command[1:]
