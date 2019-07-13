@@ -3,6 +3,7 @@ setup of the bot, as well as pulling in and configuring all the modules.
 """
 
 from discord.ext import commands
+from modules import community
 from modules import core
 from modules import gaming
 from modules import module
@@ -11,6 +12,7 @@ import json
 import logging
 
 shared.bot = commands.Bot(None)
+community.register_commands()
 core.register_commands()
 gaming.register_commands()
 
@@ -54,6 +56,7 @@ def main():
               '.json".')
         return
     shared.bot.run(auth['token'])
+    shared.perform_scheduled_activities()
 
 
 if __name__ == '__main__':

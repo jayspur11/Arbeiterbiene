@@ -4,7 +4,8 @@ Python-based Discord chat bot.
 ## How to bot?
 First, you'll want to install
 [Python 3.6.8](https://www.python.org/downloads/release/python-368/) - this is
-the latest version supported by `discord.py`, so it just makes life easier.
+the latest version supported by `discord.py`, so it just makes life easier. Once
+that's done, `pip3 install emoji` to grab our own dependency.
 
 Clone the source with
 `git clone https://github.com/Mythos-Softworks/Arbeiterbiene.git`, then go into
