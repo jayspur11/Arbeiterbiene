@@ -2,30 +2,33 @@
 setup of the bot, as well as pulling in and configuring all the modules.
 """
 
-from discord.ext import commands
-from modules import community
-from modules import core
-from modules import gaming
-from modules import module
-from modules import shared
 import json
 import logging
+from discord.ext import commands
 
-shared.bot = commands.Bot(None)
-community.register_commands()
-core.register_commands()
-gaming.register_commands()
+_bot = commands.Bot(None)
+_command_registry = {}
 
 
-@shared.bot.event
+@_bot.event
 async def on_ready():
     print("Hello world!")
 
 
-@shared.bot.event
+@_bot.event
 async def on_message(message):
-    if message.channel.is_private or shared.bot.user.id in message.raw_mentions:
-        await module.process_message(message)
+    if not (message.channel.is_private or _bot.user.id in message.raw_mentions):
+        return
+    content = message.content.split(' ', 2)
+    cmd = content[1]
+    if cmd not in _command_registry:
+        # TODO: send an error message
+        return
+    command = _command_registry[cmd]
+    try:
+        await command.run(message, _bot)
+    except (IndexError, ValueError):
+        await _bot.send_message(message.channel, command.help_text())
 
 
 def _configure_file_logging():
@@ -55,8 +58,7 @@ def main():
               '"arbeiterbiene.py". It should follow the format of "example-auth'
               '.json".')
         return
-    shared.bot.run(auth['token'])
-    shared.perform_scheduled_activities()
+    _bot.run(auth['token'])
 
 
 if __name__ == '__main__':
