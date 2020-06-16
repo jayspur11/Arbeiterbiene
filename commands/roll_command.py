@@ -1,3 +1,4 @@
+import random
 import re
 from commands import base_command
 
@@ -28,6 +29,22 @@ class RollCommand(base_command.BaseCommand):
         else:
             result_string = roll_cmd
         await bot.send_message(message.channel, result_string)
+
+
+def _roll_dice(num, sides):
+    results = []
+    for i in range(num):
+        results.append(str(random.randint(1, sides)))
+    return '({})'.format(' + '.join(results))
+
+
+def _roll_table(num, table):
+    results = []
+    highest = len(table) - 1
+    for i in range(num):
+        results.append(table[random.randint(0, highest)])
+    # TODO: sanitize output
+    return ' + '.join(results)
 
 
 def _parse_roll(command):
