@@ -1,7 +1,8 @@
 class BaseCommand:
     """Base class that outlines the methods needed by the command registrar."""
 
-    def trigger_word(self):
+    @classmethod
+    def trigger_word(cls):
         """Defines the word used to trigger this command,
             which is used by the registrar for fast indexing.
         Subclasses should return a string."""

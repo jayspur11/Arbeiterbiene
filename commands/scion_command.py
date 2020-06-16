@@ -5,7 +5,8 @@ from commands import base_command
 class ScionCommand(base_command.BaseCommand):
     """Class to add a 'scion' command to the bot."""
 
-    def trigger_word(self):
+    @classmethod
+    def trigger_word(cls):
         return "scion"
 
     def help_text(self):

@@ -8,7 +8,8 @@ _server_emoji_re = re.compile(r'<:.*:(.*)>')
 class PollCommand(base_command.BaseCommand):
     """Class to add a 'poll' command to the bot."""
 
-    def trigger_word(self):
+    @classmethod
+    def trigger_word(cls):
         return "poll"
 
     def help_text(self):

@@ -4,7 +4,8 @@ from commands import base_command
 class DieCommand(base_command.BaseCommand):
     """Class to add 'die' command to bot."""
 
-    def trigger_word(self):
+    @classmethod
+    def trigger_word(cls):
         return "die"
 
     def help_text(self):

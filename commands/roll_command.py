@@ -10,7 +10,8 @@ _numeric_equation_re = re.compile(r'[()+\-\s\d]*')
 class RollCommand(base_command.BaseCommand):
     """Class to add a 'roll' command to the bot."""
 
-    def trigger_word(self):
+    @classmethod
+    def trigger_word(cls):
         return "roll"
 
     def help_text(self):
