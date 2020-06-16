@@ -30,6 +30,7 @@ async def on_message(message):
         return
     content = message.content.split(' ', 2)
     cmd = content[1]
+    message.content = content[2] if len(content) > 2 else ''
     if cmd not in _command_registry:
         # TODO: send an error message
         return
