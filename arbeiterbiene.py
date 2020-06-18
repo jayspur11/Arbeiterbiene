@@ -14,7 +14,7 @@ from discord.ext import commands
 
 _event_loop = asyncio.get_event_loop()
 _bot = commands.Bot("", loop=_event_loop)
-_command_io = command_io.CommandIO(_bot)
+_command_io = command_io.CommandIO(_bot, _event_loop)
 _command_registry = {
     die_command.DieCommand.trigger_word(): die_command.DieCommand(),
     poll_command.PollCommand.trigger_word(): poll_command.PollCommand(),
