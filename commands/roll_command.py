@@ -21,15 +21,15 @@ class RollCommand(base_command.BaseCommand):
         `X` is the number of dice to roll, and `Y` is the number of sides.
         """
 
-    async def run(self, message, bot):
-        if not len(message.content):
+    async def run(self, command_io):
+        if not len(command_io.message.content):
             raise ValueError
-        roll_cmd = _parse_roll(message.content)
+        roll_cmd = _parse_roll(command_io.message.content)
         if _numeric_equation_re.fullmatch(roll_cmd):
             result_string = "**{}**\n{}".format(str(eval(roll_cmd)), roll_cmd)
         else:
             result_string = roll_cmd
-        await bot.send_message(message.channel, result_string)
+        await command_io.bot.send_message(command_io.message.channel, result_string)
 
 
 def _roll_dice(num, sides):
