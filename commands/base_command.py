@@ -1,3 +1,6 @@
+from commands.command_io import CommandIO
+
+
 class BaseCommand:
     """Base class that outlines the methods needed by the command registrar."""
 
@@ -15,11 +18,6 @@ class BaseCommand:
         - Note that this can use Discord markdown."""
         raise NotImplementedError
 
-    async def run(self, message, bot):
-        """Executes the command.
-
-        Args:
-            message: (discord.Message) received from Discord.
-            bot: (discord.ext.commands.Bot) used to communicate with Discord.
-        """
+    async def run(self, command_io: CommandIO):
+        """Executes the command."""
         raise NotImplementedError

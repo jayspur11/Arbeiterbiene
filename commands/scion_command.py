@@ -26,12 +26,12 @@ class ScionCommand(base_command.BaseCommand):
            (e.g. `$scion 3 4`)
         """
 
-    async def run(self, message, bot):
-        if not len(message.content):
+    async def run(self, command_io):
+        if not len(command_io.message.content):
             raise ValueError
         num_dice = 0
         successes = 0
-        args = message.content.split(' ')
+        args = command_io.message.content.split(' ')
         for arg in args:
             if arg[0] == 's':
                 successes += int(arg[1:])
@@ -51,8 +51,8 @@ class ScionCommand(base_command.BaseCommand):
             if result == 10:
                 successes += 1
             results.append(result)
-        await bot.send_message(message.channel,
-                               _scion_result_message(successes, results))
+        await command_io.bot.send_message(command_io.message.channel,
+                                          _scion_result_message(successes, results))
 
 
 def _scion_epic_successes(epic_attr_value):
