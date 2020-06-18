@@ -8,6 +8,7 @@ import logging
 from commands import command_io
 from commands import die_command
 from commands import poll_command
+from commands import repost_command
 from commands import roll_command
 from commands import scion_command
 from discord.ext import commands
@@ -18,6 +19,7 @@ _command_io = command_io.CommandIO(_bot, _event_loop)
 _command_registry = {
     die_command.DieCommand.trigger_word(): die_command.DieCommand(),
     poll_command.PollCommand.trigger_word(): poll_command.PollCommand(),
+    repost_command.RepostCommand.trigger_word(): repost_command.RepostCommand(),
     roll_command.RollCommand.trigger_word(): roll_command.RollCommand(),
     scion_command.ScionCommand.trigger_word(): scion_command.ScionCommand()
 }
