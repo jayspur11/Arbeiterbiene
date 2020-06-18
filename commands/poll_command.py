@@ -46,6 +46,6 @@ def get_emoji_by_id(sid, server):
     """
     # linear search on hashable data. ugh.
     for emojus in server.emojis:
-        if sid == emojus.id:
+        if sid == str(emojus.id):
             return emojus
     return None
