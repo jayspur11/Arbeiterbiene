@@ -51,8 +51,8 @@ class ScionCommand(base_command.BaseCommand):
             if result == 10:
                 successes += 1
             results.append(result)
-        await command_io.bot.send_message(command_io.message.channel,
-                                          _scion_result_message(successes, results))
+        await command_io.message.channel.send(
+            _scion_result_message(successes, results))
 
 
 def _scion_epic_successes(epic_attr_value):

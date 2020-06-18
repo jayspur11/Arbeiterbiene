@@ -14,5 +14,5 @@ class DieCommand(base_command.BaseCommand):
         """
 
     async def run(self, command_io):
-        await command_io.bot.send_message(command_io.message.channel, ':(')
+        await command_io.message.channel.send(':(')
         raise KeyboardInterrupt

@@ -32,7 +32,8 @@ async def on_ready():
 
 @_bot.event
 async def on_message(message):
-    if not (message.channel.is_private or _bot.user.id in message.raw_mentions):
+    if not (type(message.channel) in ["DMChannel", "GroupChannel"]
+            or _bot.user.id in message.raw_mentions):
         return
     content = message.content.split(' ', 2)
     cmd = content[1]
@@ -45,7 +46,7 @@ async def on_message(message):
     try:
         await command.run(_command_io)
     except (IndexError, ValueError):
-        await _bot.send_message(message.channel, command.help_text())
+        await message.channel.send(command.help_text())
 
 
 def _configure_file_logging():
