@@ -22,9 +22,9 @@ class PollCommand(base_command.BaseCommand):
         Note: The bot is, sadly, unable to handle emoji from other servers.
         """
 
-    async def run(self, message, bot):
-        custom_emoji_ids = _server_emoji_re.findall(message.content)
-        server = message.server
+    async def run(self, command_io):
+        custom_emoji_ids = _server_emoji_re.findall(command_io.message.content)
+        server = command_io.message.server
         custom_emoji = []
         for emojus_id in custom_emoji_ids:
             emojus = get_emoji_by_id(emojus_id, server)
@@ -32,9 +32,9 @@ class PollCommand(base_command.BaseCommand):
                 raise ValueError
             custom_emoji.append(emojus)
         for emojus in custom_emoji:
-            await bot.add_reaction(message, emojus)
-        for emojus_match in emoji.get_emoji_regexp().finditer(message.content):
-            await bot.add_reaction(message, emojus_match.group())
+            await command_io.bot.add_reaction(command_io.message, emojus)
+        for emojus_match in emoji.get_emoji_regexp().finditer(command_io.message.content):
+            await command_io.bot.add_reaction(command_io.message, emojus_match.group())
 
 
 def get_emoji_by_id(sid, server):

@@ -4,6 +4,7 @@ setup of the bot, as well as pulling in and configuring all the modules.
 
 import json
 import logging
+from commands import command_io
 from commands import die_command
 from commands import poll_command
 from commands import roll_command
@@ -11,6 +12,7 @@ from commands import scion_command
 from discord.ext import commands
 
 _bot = commands.Bot(None)
+_command_io = command_io.CommandIO(_bot)
 _command_registry = {
     die_command.DieCommand.trigger_word(): die_command.DieCommand(),
     poll_command.PollCommand.trigger_word(): poll_command.PollCommand(),
@@ -35,8 +37,9 @@ async def on_message(message):
         # TODO: send an error message
         return
     command = _command_registry[cmd]
+    _command_io.message = message
     try:
-        await command.run(message, _bot)
+        await command.run(_command_io)
     except (IndexError, ValueError):
         await _bot.send_message(message.channel, command.help_text())
 

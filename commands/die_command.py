@@ -13,6 +13,6 @@ class DieCommand(base_command.BaseCommand):
         Logs the bot out & kills the running process.
         """
 
-    async def run(self, message, bot):
-        await bot.send_message(message.channel, ':(')
+    async def run(self, command_io):
+        await command_io.bot.send_message(command_io.message.channel, ':(')
         raise KeyboardInterrupt
