@@ -1,4 +1,6 @@
+import os
 from commands.base_command import BaseCommand
+from discord import File
 
 
 class RepostCommand(BaseCommand):
@@ -23,4 +25,8 @@ class RepostCommand(BaseCommand):
         """
 
     async def run(self, command_io):
-        pass
+        attachment = command_io.message.attachments[0]
+        with open(attachment.filename, "bw+") as file:
+            await attachment.save(file)
+            await command_io.message.channel.send(file=File(file))
+        os.remove(attachment.filename)
