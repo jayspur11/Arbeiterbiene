@@ -29,7 +29,7 @@ class RollCommand(base_command.BaseCommand):
             result_string = "**{}**\n{}".format(str(eval(roll_cmd)), roll_cmd)
         else:
             result_string = roll_cmd
-        await command_io.bot.send_message(command_io.message.channel, result_string)
+        await command_io.message.channel.send(result_string)
 
 
 def _roll_dice(num, sides):
