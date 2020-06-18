@@ -24,7 +24,7 @@ class PollCommand(base_command.BaseCommand):
 
     async def run(self, command_io):
         custom_emoji_ids = _server_emoji_re.findall(command_io.message.content)
-        server = command_io.message.server
+        server = command_io.message.guild
         custom_emoji = []
         for emojus_id in custom_emoji_ids:
             emojus = get_emoji_by_id(emojus_id, server)
@@ -32,9 +32,9 @@ class PollCommand(base_command.BaseCommand):
                 raise ValueError
             custom_emoji.append(emojus)
         for emojus in custom_emoji:
-            await command_io.bot.add_reaction(command_io.message, emojus)
+            await command_io.message.add_reaction(emojus)
         for emojus_match in emoji.get_emoji_regexp().finditer(command_io.message.content):
-            await command_io.bot.add_reaction(command_io.message, emojus_match.group())
+            await command_io.message.add_reaction(emojus_match.group())
 
 
 def get_emoji_by_id(sid, server):
