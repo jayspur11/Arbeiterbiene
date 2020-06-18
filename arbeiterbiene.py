@@ -2,6 +2,7 @@
 setup of the bot, as well as pulling in and configuring all the modules.
 """
 
+import asyncio
 import json
 import logging
 from commands import die_command
@@ -10,7 +11,8 @@ from commands import roll_command
 from commands import scion_command
 from discord.ext import commands
 
-_bot = commands.Bot(None)
+_event_loop = asyncio.get_event_loop()
+_bot = commands.Bot("", loop=_event_loop)
 _command_registry = {
     die_command.DieCommand.trigger_word(): die_command.DieCommand(),
     poll_command.PollCommand.trigger_word(): poll_command.PollCommand(),
