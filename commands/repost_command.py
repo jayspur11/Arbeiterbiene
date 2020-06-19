@@ -25,6 +25,9 @@ class RepostCommand(BaseCommand):
         """
 
     async def run(self, command_io):
+        if not len(command_io.message.attachments):
+            raise IndexError
+        # command_io.event_loop.call_later()
         attachment = command_io.message.attachments[0]
         with open(attachment.filename, "bw+") as file:
             await attachment.save(file)
