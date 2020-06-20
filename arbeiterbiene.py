@@ -45,7 +45,7 @@ async def on_message(message):
     _command_io.message = message
     try:
         await command.run(_command_io)
-    except (IndexError, ValueError):
+    except (IndexError, ValueError, KeyError):
         await message.channel.send(command.help_text())
 
 
