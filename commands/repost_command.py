@@ -1,4 +1,6 @@
+import asyncio
 import os
+import random
 from commands.base_command import BaseCommand
 from discord import File
 
@@ -31,6 +33,7 @@ class RepostCommand(BaseCommand):
         channel = command_io.message.channel
         if not len(command_io.message.attachments):
             # No attachment means clear the repost or throw.
+            self._requests[channel].cancel()
             del self._requests[channel]
             return
         attachment = command_io.message.attachments[0]
@@ -38,24 +41,23 @@ class RepostCommand(BaseCommand):
         with open(filename, "bw+") as file:
             await attachment.save(file)
         self._requests[channel] = _RepostRequest(channel, filename)
-        # TODO: schedule repost
 
 
 class _RepostRequest:
     def __init__(self, channel, filename):
         self._channel = channel
         self._filename = filename
-        self._timer_handle = None
+        self._schedule()
 
-    def __del__(self):
-        if self._timer_handle:
-            self._timer_handle.cancel()
+    def cancel(self):
+        self._future.cancel()
         os.remove(self._filename)
 
-    def schedule_repost(self, event_loop, delay):
-        self._timer_handle = event_loop.call_later(delay, self._repost_and_reschedule, self, event_loop, delay)
+    def _schedule(self):
+        self._future = asyncio.ensure_future(self._repost_and_reschedule())
 
-    async def _repost_and_reschedule(self, event_loop, delay):
-        with open(self._filename, "r") as file:
+    async def _repost_and_reschedule(self):
+        await asyncio.sleep(random.randint(3600, 3*3600))
+        with open(self._filename, "br") as file:
             await self._channel.send(file=File(file))
-        # TODO: schedule again
+        self._schedule()
