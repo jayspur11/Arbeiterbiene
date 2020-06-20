@@ -36,6 +36,9 @@ class RepostCommand(BaseCommand):
             self._requests[channel].cancel()
             del self._requests[channel]
             return
+        if channel in self._requests:
+            self._requests[channel].cancel()
+            del self._requests[channel]
         attachment = command_io.message.attachments[0]
         filename = attachment.filename
         with open(filename, "bw+") as file:
