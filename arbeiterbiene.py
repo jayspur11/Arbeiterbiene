@@ -2,20 +2,24 @@
 setup of the bot, as well as pulling in and configuring all the modules.
 """
 
+import asyncio
 import json
 import logging
 from commands import command_io
 from commands import die_command
 from commands import poll_command
+from commands import repost_command
 from commands import roll_command
 from commands import scion_command
 from discord.ext import commands
 
-_bot = commands.Bot(None)
-_command_io = command_io.CommandIO(_bot)
+_event_loop = asyncio.get_event_loop()
+_bot = commands.Bot("", loop=_event_loop)
+_command_io = command_io.CommandIO(_bot, _event_loop)
 _command_registry = {
     die_command.DieCommand.trigger_word(): die_command.DieCommand(),
     poll_command.PollCommand.trigger_word(): poll_command.PollCommand(),
+    repost_command.RepostCommand.trigger_word(): repost_command.RepostCommand(),
     roll_command.RollCommand.trigger_word(): roll_command.RollCommand(),
     scion_command.ScionCommand.trigger_word(): scion_command.ScionCommand()
 }
@@ -41,7 +45,7 @@ async def on_message(message):
     _command_io.message = message
     try:
         await command.run(_command_io)
-    except (IndexError, ValueError):
+    except (IndexError, ValueError, KeyError):
         await message.channel.send(command.help_text())
 
 
