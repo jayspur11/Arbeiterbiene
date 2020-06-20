@@ -42,15 +42,14 @@ class RepostCommand(BaseCommand):
         filename = attachment.filename
         with open(filename, "bw+") as file:
             await attachment.save(file)
-        self._requests[channel] = _RepostRequest(channel, filename)
+        self._requests[channel] = _RepostRequest(command_io.message, filename)
 
 
 class _RepostRequest:
-    def __init__(self, channel, filename):
-        self._channel = channel
+    def __init__(self, message, filename):
+        self._message = message
         self._filename = filename
         self._schedule()
-        self._message = None
 
     def cancel(self):
         self._future.cancel()
@@ -61,8 +60,7 @@ class _RepostRequest:
 
     async def _repost_and_reschedule(self):
         await asyncio.sleep(random.randint(3600, 3 * 3600))
-        if self._message:
-            self._message.delete()
+        await self._message.delete()
         with open(self._filename, "br") as file:
-            self._message = await self._channel.send(file=File(file))
+            self._message = await self._message.channel.send(file=File(file))
         self._schedule()
