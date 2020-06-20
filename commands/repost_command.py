@@ -19,12 +19,11 @@ class RepostCommand(BaseCommand):
         return """```repost (+attachment)```
         Schedules occasional reposting of the attachment.
         
-        When the bot receives this command, it will save the attachment and
-         re-upload it to the original channel every few hours (exact timing is
-         determined randomly).
+        When the bot receives this command, it will save the attachment and re-upload it to the original channel 
+        every few hours (exact timing determined randomly). Each subsequent upload will delete the previous one, 
+        to avoid cluttering the channel.
          
-        If the bot receives a second command in the same channel, it will
-         override the previous attachment.
+        If the bot receives a second command in the same channel, it will override the previous attachment.
         
         If the bot receives an empty command, it will stop reposting.
         """
@@ -51,6 +50,7 @@ class _RepostRequest:
         self._channel = channel
         self._filename = filename
         self._schedule()
+        self._message = None
 
     def cancel(self):
         self._future.cancel()
@@ -60,7 +60,9 @@ class _RepostRequest:
         self._future = asyncio.ensure_future(self._repost_and_reschedule())
 
     async def _repost_and_reschedule(self):
-        await asyncio.sleep(random.randint(3600, 3*3600))
+        await asyncio.sleep(random.randint(3600, 3 * 3600))
+        if self._message:
+            self._message.delete()
         with open(self._filename, "br") as file:
-            await self._channel.send(file=File(file))
+            self._message = await self._channel.send(file=File(file))
         self._schedule()
