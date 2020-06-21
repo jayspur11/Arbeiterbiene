@@ -20,8 +20,7 @@ async def on_ready():
 
 @_bot.event
 async def on_message(message):
-    if not (type(message.channel) in ["DMChannel", "GroupChannel"]
-            or _bot.user.id in message.raw_mentions):
+    if not (type(message.channel) in ["DMChannel", "GroupChannel"] or _bot.user.id in message.raw_mentions):
         return
     content = message.content.split(' ', 2)
     cmd = content[1]
@@ -41,11 +40,9 @@ def _configure_file_logging():
     """
     Configures the logging module to output logs to file ('discord.log').
     """
-    handler = logging.FileHandler(filename='discord.log', encoding='utf-8',
-                                  mode='w')
+    handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
     handler.setFormatter(
-        logging.Formatter('%(asctime)s | %(levelname)s | %(name)s: %(message)s',
-                          '%Y-%m-%d %I:%M:%S %p'))
+        logging.Formatter('%(asctime)s | %(levelname)s | %(name)s: %(message)s', '%Y-%m-%d %I:%M:%S %p'))
     logger = logging.getLogger('discord')
     logger.setLevel(logging.DEBUG)
     logger.addHandler(handler)
