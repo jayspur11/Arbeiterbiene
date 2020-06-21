@@ -2,6 +2,7 @@ import asyncio
 import os
 import random
 from commands.base_command import BaseCommand
+from datetime import datetime
 from discord import File
 
 
@@ -60,7 +61,9 @@ class _RepostRequest:
 
     async def _repost_and_reschedule(self):
         await asyncio.sleep(random.randint(3600, 3 * 3600))
-        await self._message.delete()
-        with open(self._filename, "br") as file:
-            self._message = await self._message.channel.send(file=File(file))
+        now = datetime.now()
+        if 8 <= now.time().hour < 17:
+            await self._message.delete()
+            with open(self._filename, "br") as file:
+                self._message = await self._message.channel.send(file=File(file))
         self._schedule()
