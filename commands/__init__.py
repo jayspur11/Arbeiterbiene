@@ -6,6 +6,7 @@ from commands.poll_command import PollCommand
 from commands.repost_command import RepostCommand
 from commands.roll_command import RollCommand
 from commands.scion_command import ScionCommand
+from commands.woof_command import WoofCommand
 
 
 def command_registry():
@@ -15,5 +16,6 @@ def command_registry():
         PollCommand.trigger_word(): PollCommand(),
         RepostCommand.trigger_word(): RepostCommand(),
         RollCommand.trigger_word(): RollCommand(),
-        ScionCommand.trigger_word(): ScionCommand()
+        ScionCommand.trigger_word(): ScionCommand(),
+        WoofCommand.trigger_word(): WoofCommand()
     }
