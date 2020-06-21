@@ -1,9 +1,8 @@
 import asyncio
-import os
 import random
 from commands.base_command import BaseCommand
 from datetime import datetime
-from discord import File
+from discord import Embed
 
 
 class RepostCommand(BaseCommand):
@@ -40,21 +39,18 @@ class RepostCommand(BaseCommand):
             self._requests[channel].cancel()
             del self._requests[channel]
         attachment = command_io.message.attachments[0]
-        filename = attachment.filename
-        with open(filename, "bw+") as file:
-            await attachment.save(file)
-        self._requests[channel] = _RepostRequest(command_io.message, filename)
+        self._requests[channel] = _RepostRequest(channel, attachment.url)
 
 
 class _RepostRequest:
-    def __init__(self, message, filename):
-        self._message = message
-        self._filename = filename
+    def __init__(self, channel, url):
+        self._message = None
+        self._channel = channel
+        self._url = url
         self._schedule()
 
     def cancel(self):
         self._future.cancel()
-        os.remove(self._filename)
 
     def _schedule(self):
         self._future = asyncio.ensure_future(self._repost_and_reschedule())
@@ -63,7 +59,7 @@ class _RepostRequest:
         await asyncio.sleep(random.randint(3600, 3 * 3600))
         now = datetime.now()
         if 8 <= now.time().hour < 17:
-            await self._message.delete()
-            with open(self._filename, "br") as file:
-                self._message = await self._message.channel.send(file=File(file))
+            if self._message:
+                await self._message.delete()
+            self._message = await self._channel.send(embed=Embed().set_image(url=self._url))
         self._schedule()
