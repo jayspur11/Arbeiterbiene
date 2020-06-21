@@ -1,9 +1,10 @@
 import json
-from commands.base_command import BaseCommand
+from commands import BaseCommand
+from discord import Embed
 from urllib import request
 
 
-class MeowCommand (BaseCommand):
+class MeowCommand(BaseCommand):
     """Class to add a 'meow' command to the bot."""
 
     @classmethod
@@ -16,7 +17,9 @@ class MeowCommand (BaseCommand):
         """
 
     async def run(self, command_io):
-        with request.urlopen("https://some-random-api.ml/facts/cat") as rfact, request.urlopen("https://some-random-api.ml/img/cat") as rimg:
+        freq = request.Request("https://some-random-api.ml/facts/cat", headers={"User-Agent": "arbeiterbiene"})
+        ireq = request.Request("http://some-random-api.ml/img/cat", headers={"User-Agent": "arbeiterbiene"})
+        with request.urlopen(freq) as rfact, request.urlopen(ireq) as rimg:
             fact = json.loads(rfact.read())["fact"]
             img_url = json.loads(rimg.read())["link"]
-            command_io.message.channel.send("%s\n%s" % fact, img_url)
+            await command_io.message.channel.send(fact, embed=Embed().set_image(url=img_url))
