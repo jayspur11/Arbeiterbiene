@@ -1,28 +1,16 @@
 """ This is the main file for the Discord bot. It's responsible for the primary
 setup of the bot, as well as pulling in and configuring all the modules.
 """
-
 import asyncio
+import commands
 import json
 import logging
-from commands import command_io
-from commands import die_command
-from commands import poll_command
-from commands import repost_command
-from commands import roll_command
-from commands import scion_command
-from discord.ext import commands
+from discord.ext import commands as discord_commands
 
 _event_loop = asyncio.get_event_loop()
-_bot = commands.Bot("", loop=_event_loop)
-_command_io = command_io.CommandIO(_bot, _event_loop)
-_command_registry = {
-    die_command.DieCommand.trigger_word(): die_command.DieCommand(),
-    poll_command.PollCommand.trigger_word(): poll_command.PollCommand(),
-    repost_command.RepostCommand.trigger_word(): repost_command.RepostCommand(),
-    roll_command.RollCommand.trigger_word(): roll_command.RollCommand(),
-    scion_command.ScionCommand.trigger_word(): scion_command.ScionCommand()
-}
+_bot = discord_commands.Bot("", loop=_event_loop)
+_command_io = commands.CommandIO(_bot, _event_loop)
+_command_registry = commands.command_registry()
 
 
 @_bot.event
