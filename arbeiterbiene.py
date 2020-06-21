@@ -9,7 +9,6 @@ from discord.ext import commands as discord_commands
 
 _event_loop = asyncio.get_event_loop()
 _bot = discord_commands.Bot("", loop=_event_loop)
-_command_io = commands.CommandIO(_bot, _event_loop)
 _command_registry = commands.command_registry()
 
 
@@ -29,9 +28,9 @@ async def on_message(message):
         # TODO: send an error message
         return
     command = _command_registry[cmd]
-    _command_io.message = message
+    command_io = commands.CommandIO(_bot, _event_loop, message)
     try:
-        await command.run(_command_io)
+        await command.run(command_io)
     except (IndexError, ValueError, KeyError):
         await message.channel.send(command.help_text())
 
