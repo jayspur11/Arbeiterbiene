@@ -1,3 +1,4 @@
+from commands.base_command import BaseCommand
 from commands.command_io import CommandIO
 from commands.die_command import DieCommand
 from commands.meow_command import MeowCommand
