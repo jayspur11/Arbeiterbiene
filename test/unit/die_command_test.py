@@ -5,7 +5,7 @@ import asyncio
 import unittest
 
 
-class DieCommandTests(unittest.TestCase):
+class DieCommandTest(unittest.TestCase):
     def test_basic_command(self):
         command = DieCommand()
         mock_cmdio = AsyncMock()
