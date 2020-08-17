@@ -7,7 +7,7 @@ import urllib
 import unittest
 
 
-class MeowCommandTest(unittest.TestCase):
+class WoofCommandTest(unittest.TestCase):
     @unittest.mock.patch('json.loads')
     @unittest.mock.patch('urllib.request.urlopen')
     def test_basic_command(self, mock_urlopen, mock_loads):
