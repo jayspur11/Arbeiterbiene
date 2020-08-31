@@ -10,9 +10,13 @@ from commands.scion_command import ScionCommand
 from commands.woof_command import WoofCommand
 
 
-def command_registry():
+def command_registry(airnowapi_key):
+    """
+    Args:
+    - airnowapi_key: (string) API key for `AirNowApi.org`.
+    """
     return {
-        AqiCommand.trigger_word(): AqiCommand(),
+        AqiCommand.trigger_word(): AqiCommand(airnowapi_key),
         DieCommand.trigger_word(): DieCommand(),
         MeowCommand.trigger_word(): MeowCommand(),
         PollCommand.trigger_word(): PollCommand(),
