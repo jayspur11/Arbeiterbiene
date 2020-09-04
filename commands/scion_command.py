@@ -44,7 +44,7 @@ class ScionCommand(base_command.BaseCommand):
             else:
                 num_dice += int(arg)
         results = []
-        for i in range(num_dice):
+        for _ in range(num_dice):
             result = random.randint(1, 10)
             if result > 6:
                 successes += 1
