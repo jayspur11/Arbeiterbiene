@@ -34,7 +34,7 @@ class RollCommand(base_command.BaseCommand):
 
 def _roll_dice(num, sides):
     results = []
-    for i in range(num):
+    for _ in range(num):
         results.append(str(random.randint(1, sides)))
     return '({})'.format(' + '.join(results))
 
@@ -42,7 +42,7 @@ def _roll_dice(num, sides):
 def _roll_table(num, table):
     results = []
     highest = len(table) - 1
-    for i in range(num):
+    for _ in range(num):
         results.append(table[random.randint(0, highest)])
     # TODO: sanitize output
     return ' + '.join(results)
