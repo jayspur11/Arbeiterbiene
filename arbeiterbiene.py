@@ -9,7 +9,6 @@ from discord.ext import commands as discord_commands
 
 _event_loop = asyncio.get_event_loop()
 _bot = discord_commands.Bot("", loop=_event_loop)
-_command_registry = commands.command_registry()
 
 
 @_bot.event
@@ -51,10 +50,13 @@ def main():
     """
     The entry point of the Arbeiterbiene bot.
     """
+    global _command_registry
     _configure_file_logging()
     try:
         with open('auth.json', 'r') as authfile:
             auth = json.load(authfile)
+            _command_registry = commands.command_registry(
+                auth.get('airnowapi_key', ''))
     except FileNotFoundError:
         print('Please set up an "auth.json" file in the same directory as '
               '"arbeiterbiene.py". It should follow the format of "example-auth'
