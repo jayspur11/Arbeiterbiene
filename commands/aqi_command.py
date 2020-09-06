@@ -36,7 +36,7 @@ class AqiCommand(BaseCommand):
             "?zipCode={zip_code}&format=application/json&api_key={api_key}"
             .format(zip_code=zip_code_match.group(), api_key=self._api_key))
         with request.urlopen(req) as raqi:
-            results = json.loads(raqi.read())
+            results = json.loads(raqi.read().decode())
             message_list = [
                 "Results for {zip}:".format(zip=zip_code_match.group())
             ]
