@@ -5,10 +5,12 @@ import asyncio
 import commands
 import json
 import logging
+import re
 from discord.ext import commands as discord_commands
 
 _event_loop = asyncio.get_event_loop()
 _bot = discord_commands.Bot("", loop=_event_loop)
+_cmd_re = re.compile(r'(([^\s]+)\s*){2}(.*)')
 
 
 @_bot.event
@@ -21,9 +23,8 @@ async def on_message(message):
     if not (type(message.channel) in ["DMChannel", "GroupChannel"]
             or _bot.user.id in message.raw_mentions):
         return
-    content = message.content.split(' ', 2)
-    cmd = content[1]
-    message.content = content[2] if len(content) > 2 else ''
+    cmd, message.content = _cmd_re.match(message.content).group(2,3)
+    cmd = cmd.lower()
     if cmd not in _command_registry:
         # TODO: send an error message
         return
