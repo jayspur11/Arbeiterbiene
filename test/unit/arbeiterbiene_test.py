@@ -33,5 +33,15 @@ class ArbeiterbieneTest(unittest.TestCase):
 
         self._mock_command.run.assert_called_once()
 
+    def test_command_called_in_group(self):
+        bot = Arbeiterbiene('')
+        message = Mock()
+        message.content = '@bot command argument1 argument2'
+        message.channel.mock_add_spec(discord.GroupChannel)
+
+        bot.loop.run_until_complete(bot.on_message(message))
+
+        self._mock_command.run.assert_called_once()
+
 if __name__ == "__main__":
     unittest.main()
