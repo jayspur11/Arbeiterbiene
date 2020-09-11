@@ -53,5 +53,16 @@ class ArbeiterbieneTest(unittest.TestCase):
 
         self._mock_command.run.assert_called_once()
 
+    def test_message_content_pruned(self):
+        bot = Arbeiterbiene('')
+        message = Mock()
+        message.content = '@bot command argument1 argument2'
+        message.channel.mock_add_spec(discord.DMChannel)
+
+        bot.loop.run_until_complete(bot.on_message(message))
+
+        self.assertEqual(message.content, 'argument1 argument2')
+
+
 if __name__ == "__main__":
     unittest.main()
