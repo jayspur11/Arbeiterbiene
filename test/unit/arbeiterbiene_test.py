@@ -43,5 +43,15 @@ class ArbeiterbieneTest(unittest.TestCase):
 
         self._mock_command.run.assert_called_once()
 
+    def test_command_called_when_mentioned(self):
+        bot = Arbeiterbiene('')
+        _mock_user = patch.object(Arbeiterbiene, 'user', id=123).start()
+        message = Mock(raw_mentions=[123])
+        message.content = '@bot command argument1 argument2'
+
+        bot.loop.run_until_complete(bot.on_message(message))
+
+        self._mock_command.run.assert_called_once()
+
 if __name__ == "__main__":
     unittest.main()
