@@ -2,6 +2,7 @@
 setup of the bot, as well as pulling in and configuring all the modules.
 """
 import commands
+import discord
 import json
 import logging
 import re
@@ -19,7 +20,8 @@ class Arbeiterbiene(Client):
         print("Hello world!")
 
     async def on_message(self, message):
-        if not (type(message.channel) in ["DMChannel", "GroupChannel"]
+        if not (isinstance(message.channel, discord.DMChannel)
+                or isinstance(message.channel, discord.GroupChannel)
                 or self.user.id in message.raw_mentions):
             return
         cmd, message.content = self._cmd_re.match(message.content).group(2, 3)
