@@ -1,13 +1,13 @@
 import asyncio
+import discord
 import random
-from commands.core.base_command import BaseCommand
+
+from commands.core import base_command
 from datetime import datetime
-from discord import Embed
 
 
-class RepostCommand(BaseCommand):
+class RepostCommand(base_command.BaseCommand):
     """Class to add a 'repost' command to the bot."""
-
     def __init__(self):
         self._requests = {}  # {discord.Channel: _RepostRequest}
 
@@ -61,5 +61,6 @@ class _RepostRequest:
         if 8 <= now.time().hour < 17:
             if self._message:
                 await self._message.delete()
-            self._message = await self._channel.send(embed=Embed().set_image(url=self._url))
+            self._message = await self._channel.send(
+                embed=discord.Embed().set_image(url=self._url))
         self._schedule()

@@ -1,5 +1,6 @@
 import random
 import re
+
 from commands.core import base_command
 
 _comma_re = re.compile(r',\s*')
@@ -9,7 +10,6 @@ _numeric_equation_re = re.compile(r'[()+\-\s\d]*')
 
 class RollCommand(base_command.BaseCommand):
     """Class to add a 'roll' command to the bot."""
-
     @classmethod
     def trigger_word(cls):
         return "roll"
@@ -133,11 +133,11 @@ def _extract_contents(command, opener, closer):
             unresolved -= 1
             if not unresolved:
                 break
-            next_closed = command.find(closer, next_closed+1)
+            next_closed = command.find(closer, next_closed + 1)
         else:
             unresolved += 1
-            next_open = command.find(opener, next_open+1)
-    return command[1:next_closed], command[next_closed+1:]
+            next_open = command.find(opener, next_open + 1)
+    return command[1:next_closed], command[next_closed + 1:]
 
 
 def _break_out_table(command):

@@ -1,5 +1,6 @@
 import emoji
 import re
+
 from commands.core import base_command
 
 _server_emoji_re = re.compile(r'<:.*:(.*)>')
@@ -7,7 +8,6 @@ _server_emoji_re = re.compile(r'<:.*:(.*)>')
 
 class PollCommand(base_command.BaseCommand):
     """Class to add a 'poll' command to the bot."""
-
     @classmethod
     def trigger_word(cls):
         return "poll"
@@ -33,7 +33,8 @@ class PollCommand(base_command.BaseCommand):
             custom_emoji.append(emojus)
         for emojus in custom_emoji:
             await command_io.message.add_reaction(emojus)
-        for emojus_match in emoji.get_emoji_regexp().finditer(command_io.message.content):
+        for emojus_match in emoji.get_emoji_regexp().finditer(
+                command_io.message.content):
             await command_io.message.add_reaction(emojus_match.group())
 
 

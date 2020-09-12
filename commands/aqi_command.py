@@ -1,14 +1,14 @@
 import json
 import re
-from commands.core.base_command import BaseCommand
+
+from commands.core import base_command
 from urllib import request
 
 _zip_code_re = re.compile(r'\d{5}')
 
 
-class AqiCommand(BaseCommand):
+class AqiCommand(base_command.BaseCommand):
     """Class to add 'aqi' command to bot."""
-
     @classmethod
     def trigger_word(cls):
         return "aqi"
@@ -33,19 +33,17 @@ class AqiCommand(BaseCommand):
             raise ValueError
         req = request.Request(
             "https://airnowapi.org/aq/observation/zipCode/current"
-            "?zipCode={zip_code}&format=application/json&api_key={api_key}"
-            .format(zip_code=zip_code_match.group(), api_key=self._api_key))
+            "?zipCode={zip_code}&format=application/json&api_key={api_key}".
+            format(zip_code=zip_code_match.group(), api_key=self._api_key))
         with request.urlopen(req) as raqi:
             results = json.loads(raqi.read().decode())
             message_list = [
                 "Results for {zip}:".format(zip=zip_code_match.group())
             ]
             for result in results:
-                message_list.append(
-                    "AQI ({param}): {aqi} - {category}".format(
-                        param=result.get('ParameterName', '{error}'),
-                        aqi=result.get('AQI', '{error}'),
-                        category=result.get('Category', {}).get('Name', '{error}')
-                    )
-                )
+                message_list.append("AQI ({param}): {aqi} - {category}".format(
+                    param=result.get('ParameterName', '{error}'),
+                    aqi=result.get('AQI', '{error}'),
+                    category=result.get('Category', {}).get('Name',
+                                                            '{error}')))
             await command_io.message.channel.send("\n".join(message_list))

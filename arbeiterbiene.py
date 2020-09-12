@@ -6,11 +6,12 @@ import discord
 import json
 import logging
 import re
-from commands.core.command_io import CommandIO
-from discord.client import Client
+
+from commands.core import command_io
+from discord import client as discord_client
 
 
-class Arbeiterbiene(Client):
+class Arbeiterbiene(discord_client.Client):
     _cmd_re = re.compile(r'(([^\s]+)\s*){2}(.*)')
 
     def __init__(self, airnowapi_key):
@@ -31,9 +32,8 @@ class Arbeiterbiene(Client):
             # TODO: send an error message
             return
         command = self._command_registry[cmd]
-        command_io = CommandIO(message)
         try:
-            await command.run(command_io)
+            await command.run(command_io.CommandIO(message))
         except (IndexError, ValueError, KeyError):
             await message.channel.send(command.help_text())
 

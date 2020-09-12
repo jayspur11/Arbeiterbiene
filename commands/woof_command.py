@@ -1,12 +1,12 @@
+import discord
 import json
-from commands.core.base_command import BaseCommand
-from discord import Embed
+
+from commands.core import base_command
 from urllib import request
 
 
-class WoofCommand(BaseCommand):
+class WoofCommand(base_command.BaseCommand):
     """Class to add a 'woof' command to the bot."""
-
     @classmethod
     def trigger_word(cls):
         return "woof"
@@ -17,9 +17,12 @@ class WoofCommand(BaseCommand):
         """
 
     async def run(self, command_io):
-        freq = request.Request("https://some-random-api.ml/facts/dog", headers={"User-Agent": "arbeiterbiene"})
-        ireq = request.Request("http://some-random-api.ml/img/dog", headers={"User-Agent": "arbeiterbiene"})
+        freq = request.Request("https://some-random-api.ml/facts/dog",
+                               headers={"User-Agent": "arbeiterbiene"})
+        ireq = request.Request("http://some-random-api.ml/img/dog",
+                               headers={"User-Agent": "arbeiterbiene"})
         with request.urlopen(freq) as rfact, request.urlopen(ireq) as rimg:
             fact = json.loads(rfact.read())["fact"]
             img_url = json.loads(rimg.read())["link"]
-            await command_io.message.channel.send(fact, embed=Embed().set_image(url=img_url))
+            await command_io.message.channel.send(
+                fact, embed=discord.Embed().set_image(url=img_url))
