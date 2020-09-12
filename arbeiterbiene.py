@@ -6,6 +6,7 @@ import discord
 import json
 import logging
 import re
+from commands.core.command_io import CommandIO
 from discord.client import Client
 
 
@@ -30,7 +31,7 @@ class Arbeiterbiene(Client):
             # TODO: send an error message
             return
         command = self._command_registry[cmd]
-        command_io = commands.CommandIO(message)
+        command_io = CommandIO(message)
         try:
             await command.run(command_io)
         except (IndexError, ValueError, KeyError):
