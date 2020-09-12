@@ -1,6 +1,6 @@
 import random
 import re
-from commands import base_command
+from commands.core import base_command
 
 _comma_re = re.compile(r',\s*')
 _num_re = re.compile(r'\d+')

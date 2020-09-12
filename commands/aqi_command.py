@@ -1,6 +1,6 @@
 import json
 import re
-from commands.base_command import BaseCommand
+from commands.core.base_command import BaseCommand
 from urllib import request
 
 _zip_code_re = re.compile(r'\d{5}')

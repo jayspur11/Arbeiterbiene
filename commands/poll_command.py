@@ -1,6 +1,6 @@
 import emoji
 import re
-from commands import base_command
+from commands.core import base_command
 
 _server_emoji_re = re.compile(r'<:.*:(.*)>')
 

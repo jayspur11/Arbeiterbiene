@@ -1,5 +1,5 @@
 import json
-from commands import BaseCommand
+from commands.core.base_command import BaseCommand
 from discord import Embed
 from urllib import request
 

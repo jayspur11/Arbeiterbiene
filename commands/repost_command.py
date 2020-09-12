@@ -1,6 +1,6 @@
 import asyncio
 import random
-from commands.base_command import BaseCommand
+from commands.core.base_command import BaseCommand
 from datetime import datetime
 from discord import Embed
 

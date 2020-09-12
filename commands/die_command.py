@@ -1,4 +1,4 @@
-from commands import base_command
+from commands.core import base_command
 
 
 class DieCommand(base_command.BaseCommand):
