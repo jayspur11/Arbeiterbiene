@@ -1,19 +1,18 @@
-from arbeiterbiene import Arbeiterbiene
-from test.shared.async_mock import AsyncMock
-from unittest.mock import Mock
-from unittest.mock import patch
-
+import arbeiterbiene
 import discord
 import unittest
+
+from test.shared import async_mock
+from unittest import mock
 
 
 class ArbeiterbieneTest(unittest.TestCase):
     def setUp(self):
-        self._mock_command = AsyncMock()
+        self._mock_command = async_mock.AsyncMock()
         self._patches = {
             'registry':
-            patch('commands.command_registry',
-                  return_value={'command': self._mock_command})
+            mock.patch('commands.command_registry',
+                       return_value={'command': self._mock_command})
         }
         self._mocks = {}
         for k in self._patches:
@@ -24,8 +23,8 @@ class ArbeiterbieneTest(unittest.TestCase):
             patch.stop()
 
     def test_command_called_in_dm(self):
-        bot = Arbeiterbiene('')
-        message = Mock()
+        bot = arbeiterbiene.Arbeiterbiene('')
+        message = mock.Mock()
         message.content = '@bot command argument1 argument2'
         message.channel.mock_add_spec(discord.DMChannel)
 
@@ -34,8 +33,8 @@ class ArbeiterbieneTest(unittest.TestCase):
         self._mock_command.run.assert_called_once()
 
     def test_command_called_in_group(self):
-        bot = Arbeiterbiene('')
-        message = Mock()
+        bot = arbeiterbiene.Arbeiterbiene('')
+        message = mock.Mock()
         message.content = '@bot command argument1 argument2'
         message.channel.mock_add_spec(discord.GroupChannel)
 
@@ -44,9 +43,11 @@ class ArbeiterbieneTest(unittest.TestCase):
         self._mock_command.run.assert_called_once()
 
     def test_command_called_when_mentioned(self):
-        bot = Arbeiterbiene('')
-        _mock_user = patch.object(Arbeiterbiene, 'user', id=123).start()
-        message = Mock(raw_mentions=[123])
+        bot = arbeiterbiene.Arbeiterbiene('')
+        _mock_user = mock.patch.object(arbeiterbiene.Arbeiterbiene,
+                                       'user',
+                                       id=123).start()
+        message = mock.Mock(raw_mentions=[123])
         message.content = '@bot command argument1 argument2'
 
         bot.loop.run_until_complete(bot.on_message(message))
@@ -54,8 +55,8 @@ class ArbeiterbieneTest(unittest.TestCase):
         self._mock_command.run.assert_called_once()
 
     def test_message_content_pruned(self):
-        bot = Arbeiterbiene('')
-        message = Mock()
+        bot = arbeiterbiene.Arbeiterbiene('')
+        message = mock.Mock()
         message.content = '@bot command argument1 argument2'
         message.channel.mock_add_spec(discord.DMChannel)
 

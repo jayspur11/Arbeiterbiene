@@ -1,17 +1,18 @@
-from commands import RollCommand
-from test.shared.async_mock import AsyncMock
-
 import asyncio
+import commands
 import random
 import unittest
 
+from test.shared import async_mock
+from unittest import mock
+
 
 class RollCommandTest(unittest.TestCase):
-    @unittest.mock.patch('random.randint', return_value=20)
+    @mock.patch('random.randint', return_value=20)
     def test_basic_command(self, mock_randint):
-        mock_cmdio = AsyncMock()
+        mock_cmdio = async_mock.AsyncMock()
         mock_cmdio.message.content = '1d20'
-        command = RollCommand()
+        command = commands.RollCommand()
         asyncio.get_event_loop().run_until_complete(command.run(mock_cmdio))
 
         mock_send = mock_cmdio.message.channel.send
