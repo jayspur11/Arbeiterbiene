@@ -24,6 +24,7 @@ class AqiCommandTest(unittest.TestCase):
             """
         mock_urlopen.reset_mock()
         mock_cmdio = async_mock.AsyncMock()
+        mock_cmdio.message.channel.typing = unittest.mock.MagicMock()
         mock_cmdio.message.content = '12345'
         command = commands.AqiCommand('fakeAPIkey')
 

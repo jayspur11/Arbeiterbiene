@@ -1,13 +1,13 @@
 import json
 import re
 
-from commands.core import base_command
+from commands.core import web_command
 from urllib import request
 
 _zip_code_re = re.compile(r'\d{5}')
 
 
-class AqiCommand(base_command.BaseCommand):
+class AqiCommand(web_command.WebCommand):
     """Class to add 'aqi' command to bot."""
     @classmethod
     def trigger_word(cls):
@@ -25,25 +25,26 @@ class AqiCommand(base_command.BaseCommand):
         Retrieves the current Air Quality Index for the given zip code.
         """
 
-    async def run(self, command_io):
-        if not len(command_io.message.content):
-            raise ValueError
+    def build_aqi_message(self, aqi):
+        return "AQI ({param}): {aqi} - {category}".format(
+            param=aqi.get("ParameterName", "ERROR"),
+            aqi=aqi.get("AQI", "ERROR"),
+            category=aqi.get("Category", {}).get("Name", "ERROR"))
+
+    def build_requests(self, command_io):
         zip_code_match = _zip_code_re.search(command_io.message.content)
         if not zip_code_match:
             raise ValueError
-        req = request.Request(
-            "https://airnowapi.org/aq/observation/zipCode/current"
-            "?zipCode={zip_code}&format=application/json&api_key={api_key}".
-            format(zip_code=zip_code_match.group(), api_key=self._api_key))
-        with request.urlopen(req) as raqi:
-            results = json.loads(raqi.read().decode())
-            message_list = [
-                "Results for {zip}:".format(zip=zip_code_match.group())
-            ]
-            for result in results:
-                message_list.append("AQI ({param}): {aqi} - {category}".format(
-                    param=result.get('ParameterName', '{error}'),
-                    aqi=result.get('AQI', '{error}'),
-                    category=result.get('Category', {}).get('Name',
-                                                            '{error}')))
-            await command_io.message.channel.send("\n".join(message_list))
+        return [
+            web_command.WebCommandRequest(
+                "aqi", "https://airnowapi.org/aq/observation/zipCode/current"
+                "?zipCode={zip_code}&format=application/json&api_key={api_key}"
+                .format(zip_code=zip_code_match.group(),
+                        api_key=self._api_key))
+        ]
+
+    async def run(self, command_io):
+        web_responses = self.fetch_web_responses(command_io)
+        results = json.loads(web_responses["aqi"])
+        message_list = [self.build_aqi_message(result) for result in results]
+        await command_io.message.channel.send("\n".join(message_list))
