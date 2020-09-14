@@ -1,6 +1,5 @@
 import asyncio
 import commands
-import datetime
 import random
 import unittest
 
@@ -11,7 +10,7 @@ from unittest import mock
 class RepostCommandTest(unittest.TestCase):
     def setUp(self):
         self._patches = {
-            'datetime': mock.patch('datetime.datetime'),
+            'datetime': mock.patch('commands.repost_command.datetime'),
             'randint': mock.patch('random.randint', return_value=2)
         }
         self._mocks = {}
