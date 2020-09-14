@@ -32,6 +32,7 @@ class WoofCommandTest(unittest.TestCase):
     @mock.patch('urllib.request.urlopen', side_effect=urlopen_mocked)
     def test_basic_command(self, mock_urlopen):
         mock_cmdio = async_mock.AsyncMock()
+        mock_cmdio.message.channel.typing = mock.MagicMock()
         command = commands.WoofCommand()
         asyncio.get_event_loop().run_until_complete(command.run(mock_cmdio))
 

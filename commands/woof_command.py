@@ -1,11 +1,11 @@
 import discord
 import json
 
-from commands.core import base_command
+from commands.core import web_command
 from urllib import request
 
 
-class WoofCommand(base_command.BaseCommand):
+class WoofCommand(web_command.WebCommand):
     """Class to add a 'woof' command to the bot."""
     @classmethod
     def trigger_word(cls):
@@ -16,13 +16,17 @@ class WoofCommand(base_command.BaseCommand):
         Retrieves a random image of a dog, and a fun fact.
         """
 
+    def build_requests(self, command_io):
+        return [
+            web_command.WebCommandRequest(
+                "fact", "https://some-random-api.ml/facts/dog"),
+            web_command.WebCommandRequest(
+                "image", "https://some-random-api.ml/img/dog")
+        ]
+
     async def run(self, command_io):
-        freq = request.Request("https://some-random-api.ml/facts/dog",
-                               headers={"User-Agent": "arbeiterbiene"})
-        ireq = request.Request("http://some-random-api.ml/img/dog",
-                               headers={"User-Agent": "arbeiterbiene"})
-        with request.urlopen(freq) as rfact, request.urlopen(ireq) as rimg:
-            fact = json.loads(rfact.read())["fact"]
-            img_url = json.loads(rimg.read())["link"]
-            await command_io.message.channel.send(
-                fact, embed=discord.Embed().set_image(url=img_url))
+        responses = self.fetch_web_responses(command_io)
+        await command_io.message.channel.send(
+            json.loads(responses["fact"])["fact"],
+            embed=discord.Embed().set_image(
+                url=json.loads(responses["image"])["link"]))
