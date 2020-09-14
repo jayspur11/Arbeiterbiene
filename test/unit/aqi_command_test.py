@@ -1,28 +1,32 @@
-from commands import AqiCommand
-from test.shared.async_mock import AsyncMock
-
 import asyncio
+import commands
 import json
 import urllib
 import unittest
 
+from test.shared import async_mock
+
 
 class AqiCommandTest(unittest.TestCase):
-    @unittest.mock.patch('json.loads')
     @unittest.mock.patch('urllib.request.urlopen')
-    def test_basic_command(self, mock_urlopen, mock_loads):
-        mock_urlopen.__enter__ = unittest.mock.Mock(return_value=(unittest.mock.Mock(), None))
-        mock_urlopen.__exit__ = unittest.mock.Mock(return_value=None)
-        mock_loads.return_value = [{
-            'ParameterName': 'paramName',
-            'AQI': 'aqiValue',
-            'Category': {
-                'Name': 'categoryName'
-            }
-        }]
-        mock_cmdio = AsyncMock()
+    def test_basic_command(self, mock_urlopen):
+        with mock_urlopen() as mock_response:
+            mock_response.read.return_value = b"""
+                [
+                    {
+                        "ParameterName": "paramName",
+                        "AQI": "aqiValue",
+                        "Category": {
+                            "Name": "categoryName"
+                        }
+                    }
+                ]
+            """
+        mock_urlopen.reset_mock()
+        mock_cmdio = async_mock.AsyncMock()
+        mock_cmdio.message.channel.typing = unittest.mock.MagicMock()
         mock_cmdio.message.content = '12345'
-        command = AqiCommand('fakeAPIkey')
+        command = commands.AqiCommand('fakeAPIkey')
 
         asyncio.get_event_loop().run_until_complete(command.run(mock_cmdio))
 

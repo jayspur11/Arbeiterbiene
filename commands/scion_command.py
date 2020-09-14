@@ -1,10 +1,10 @@
 import random
-from commands import base_command
+
+from commands.core import base_command
 
 
 class ScionCommand(base_command.BaseCommand):
     """Class to add a 'scion' command to the bot."""
-
     @classmethod
     def trigger_word(cls):
         return "scion"

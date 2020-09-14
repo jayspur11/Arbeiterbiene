@@ -1,19 +1,18 @@
-from commands import RepostCommand
-from test.shared.async_mock import AsyncMock
-from unittest.mock import Mock
-from unittest.mock import patch
-
 import asyncio
+import commands
 import datetime
 import random
 import unittest
+
+from test.shared import async_mock
+from unittest import mock
 
 
 class RepostCommandTest(unittest.TestCase):
     def setUp(self):
         self._patches = {
-            'datetime': patch('datetime.datetime'),
-            'randint': patch('random.randint', return_value=2)
+            'datetime': mock.patch('datetime.datetime'),
+            'randint': mock.patch('random.randint', return_value=2)
         }
         self._mocks = {}
         for k in self._patches:
@@ -26,11 +25,9 @@ class RepostCommandTest(unittest.TestCase):
             patch.stop()
 
     def test_basic_command(self):
-        mock_cmdio = AsyncMock(send=lambda: None)
-        mock_cmdio.message.attachments = [
-            Mock(url='fakeURL')
-        ]
-        command = RepostCommand()
+        mock_cmdio = async_mock.AsyncMock(send=lambda: None)
+        mock_cmdio.message.attachments = [mock.Mock(url='fakeURL')]
+        command = commands.RepostCommand()
         asyncio.get_event_loop().run_until_complete(command.run(mock_cmdio))
         asyncio.get_event_loop().run_until_complete(asyncio.sleep(3))
 
