@@ -28,5 +28,5 @@ class MeowCommand(web_command.WebCommand):
         responses = self.fetch_web_responses(command_io)
         await command_io.message.channel.send(
             json.loads(responses["fact"])["fact"],
-            embed=Embed().set_image(url=json.loads(responses["image"])["link"])
-        )
+            embed=Embed().set_image(
+                url=json.loads(responses["image"])["link"]))
