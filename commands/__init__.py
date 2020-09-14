@@ -5,6 +5,7 @@ from commands.poll_command import PollCommand
 from commands.repost_command import RepostCommand
 from commands.roll_command import RollCommand
 from commands.scion_command import ScionCommand
+from commands.weather_command import WeatherCommand
 from commands.woof_command import WoofCommand
 
 
@@ -21,5 +22,6 @@ def command_registry(airnowapi_key):
         RepostCommand.trigger_word(): RepostCommand(),
         RollCommand.trigger_word(): RollCommand(),
         ScionCommand.trigger_word(): ScionCommand(),
+        WeatherCommand.trigger_word(): WeatherCommand(''),
         WoofCommand.trigger_word(): WoofCommand()
     }
