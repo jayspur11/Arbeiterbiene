@@ -1,4 +1,5 @@
 {
-  "token":  "abcdefghijklmnopqrstuvwxyz.12345.abcde",
-  "airnowapi_key": "1A2B3C4D-5E6F-7G8H-9I0J-1A2B3D4F5G6H"
+  "token":  "Bot Token from discord.com/developers",
+  "airnowapi_key": "API key from AirNowApi.org",
+  "owm_key": "API key from OpenWeatherMap.org"
 }
