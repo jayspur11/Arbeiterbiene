@@ -22,28 +22,36 @@ class WeatherCommand(base_command.BaseCommand):
         """
         self._api_key = api_key
 
-    def build_message(self, zip, curtemp, condition, feelslike, high, low,
-                      forecast):
+    def build_message(self, city, zip, curtemp, conditions, feelslike, high,
+                      low, forecast):
         """Build the message about weather to send to Discord.
 
         Args:
+            city (string): City name that the given zip maps to.
             zip (string): Zip code weather was requested for.
             curtemp (string): Current temperature (°F).
-            condition (string): Current weather condition (e.g. sunny).
+            conditions (list[string]): Current weather conditions (e.g. sunny).
             feelslike (string): What the current temperature feels like (°F).
             high (string): Forecasted max temperature for the day (°F).
             low (string): Forecasted min temperature for the day (°F).
-            forecast (string): Forecasted weather condition (e.g. sunny).
+            forecast (list[string]): Forecasted weather conditions (e.g. sunny).
 
         Returns:
             string: Formatted message ready to send to Discord.
         """
+        conditions = [condition["description"] for condition in conditions]
+        condition = ", and ".join(
+            filter(None, [", ".join(conditions[:-1]), *conditions[-1:]]))
+        forecast = [condition["description"] for condition in forecast]
+        forecast = ", and ".join(
+            filter(None, [", ".join(forecast[:-1]), *forecast[-1:]]))
         return (
-            "Weather for {zip}:\n"
+            "Weather for {city} ({zip}):\n\n"
             "Currently {curtemp}°F with {condition} (feels like {feelslike}°F)."
             "\n\n"
             "Today is forecasted to have a high of {high}°F and a low of "
-            "{low}°F, with {forecast}.".format(zip=zip,
+            "{low}°F, with {forecast}.".format(city=city,
+                                               zip=zip,
                                                curtemp=curtemp,
                                                condition=condition,
                                                feelslike=feelslike,
@@ -83,9 +91,8 @@ class WeatherCommand(base_command.BaseCommand):
             current_weather = weather["current"]
             daily_forecast = weather["daily"][0]
             response = self.build_message(
-                zip_code, current_weather["temp"],
-                current_weather["weather"]["description"],
-                current_weather["feels_like"], daily_forecast["temp"]["max"],
-                daily_forecast["temp"]["min"],
-                daily_forecast["weather"]["description"])
-        command_io.message.channel.send(response)
+                zip_code, geocode["city"], current_weather["temp"],
+                current_weather["weather"], current_weather["feels_like"],
+                daily_forecast["temp"]["max"], daily_forecast["temp"]["min"],
+                daily_forecast["weather"])
+        await command_io.message.channel.send(response)
