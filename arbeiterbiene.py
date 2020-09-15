@@ -14,9 +14,10 @@ from discord import client as discord_client
 class Arbeiterbiene(discord_client.Client):
     _cmd_re = re.compile(r'(([^\s]+)\s*){2}(.*)')
 
-    def __init__(self, airnowapi_key):
+    def __init__(self, airnowapi_key, owm_key):
         super().__init__()
-        self._command_registry = commands.command_registry(airnowapi_key)
+        self._command_registry = commands.command_registry(
+            airnowapi_key, owm_key)
 
     async def on_ready(self):
         print("Hello world!")
@@ -68,7 +69,7 @@ def main():
             '"arbeiterbiene.py". It should follow the format of "example-auth'
             '.json".')
         return
-    bot = Arbeiterbiene(auth.get('airnowapi_key', ''))
+    bot = Arbeiterbiene(auth.get('airnowapi_key', ''), auth.get('owm_key', ''))
     bot.run(auth['token'])
 
 
