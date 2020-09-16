@@ -72,7 +72,7 @@ class WeatherCommand(base_command.BaseCommand):
         zip_code_match = _zip_code_re.search(command_io.message.content)
         if not zip_code_match:
             raise ValueError
-        with command_io.message.channel.typing():
+        async with command_io.message.channel.typing():
             zip_code = zip_code_match.group()
             # convert zip to lat/lon
             ods_req = web_command.WebCommandRequest(
