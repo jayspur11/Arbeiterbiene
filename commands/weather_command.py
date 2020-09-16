@@ -46,6 +46,7 @@ class WeatherCommand(base_command.BaseCommand):
         forecast = ", and ".join(
             filter(None, [", ".join(forecast[:-1]), *forecast[-1:]]))
         return (
+            "*Powered by OpenWeatherMap.org*\n"
             "Weather for {zip} ({city}):"
             "\n\n"
             "Currently {curtemp:.0f}°F with {condition} (feels like "
