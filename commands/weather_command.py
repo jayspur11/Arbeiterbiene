@@ -46,18 +46,20 @@ class WeatherCommand(base_command.BaseCommand):
         forecast = ", and ".join(
             filter(None, [", ".join(forecast[:-1]), *forecast[-1:]]))
         return (
-            "Weather for {zip} ({city}):\n\n"
-            "Currently {curtemp}°F with {condition} (feels like {feelslike}°F)."
+            "Weather for {zip} ({city}):"
             "\n\n"
-            "Today is forecasted to have a high of {high}°F and a low of "
-            "{low}°F, with {forecast}.".format(city=city,
-                                               zip=zip,
-                                               curtemp=curtemp,
-                                               condition=condition,
-                                               feelslike=feelslike,
-                                               high=high,
-                                               low=low,
-                                               forecast=forecast))
+            "Currently {curtemp:.0f}°F with {condition} (feels like "
+            "{feelslike:.0f}°F)."
+            "\n\n"
+            "Today is forecasted to have a high of {high:.0f}°F and a low of "
+            "{low:.0f}°F, with {forecast}.".format(city=city,
+                                                   zip=zip,
+                                                   curtemp=float(curtemp),
+                                                   condition=condition,
+                                                   feelslike=float(feelslike),
+                                                   high=float(high),
+                                                   low=float(low),
+                                                   forecast=forecast))
 
     def help_text(self):
         return (
