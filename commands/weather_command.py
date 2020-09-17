@@ -1,5 +1,5 @@
 from commands.core import base_command
-from commands.core import web_command
+from web import web_worker
 from urllib import request
 
 import json
@@ -74,23 +74,19 @@ class WeatherCommand(base_command.BaseCommand):
             raise ValueError
         async with command_io.message.channel.typing():
             zip_code = zip_code_match.group()
+            worker = web_worker.WebWorker()
             # convert zip to lat/lon
-            ods_req = web_command.WebCommandRequest(
-                '', "https://public.opendatasoft.com/api/records/1.0/search?"
+            geocode = json.loads(worker.make_request(
+                "https://public.opendatasoft.com/api/records/1.0/search?"
                 "dataset=us-zip-code-latitude-and-longitude&q=zip={zip}".
-                format(zip=zip_code))
-            with request.urlopen(ods_req.request) as ods_res:
-                geocode = json.loads(
-                    ods_res.read().decode())["records"][0]["fields"]
+                format(zip=zip_code)))
             # fetch current & forecasted weather
-            owm_req = web_command.WebCommandRequest(
-                '', "https://api.openweathermap.org/data/2.5/onecall?"
+            weather = json.loads(worker.make_request(
+                "https://api.openweathermap.org/data/2.5/onecall?"
                 "lat={lat}&lon={lon}&exclude=minutely,hourly&appid={key}&"
                 "units=imperial".format(lat=geocode["latitude"],
                                         lon=geocode["longitude"],
-                                        key=self._api_key))
-            with request.urlopen(owm_req.request) as owm_res:
-                weather = json.loads(owm_res.read().decode())
+                                        key=self._api_key)))
             current_weather = weather["current"]
             daily_forecast = weather["daily"][0]
             response = self.build_message(
