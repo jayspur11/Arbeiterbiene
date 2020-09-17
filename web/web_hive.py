@@ -38,7 +38,7 @@ class WebHive:
             return None
         return cell.data
 
-    def store(self, key, data, ttl=None):
+    def store(self, key, data, ttl):
         """Save data in the cache.
 
         Args:
