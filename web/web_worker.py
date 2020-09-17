@@ -4,8 +4,11 @@ from web import web_hive
 class WebWorker:
     """Class to fetch information from the web."""
     cache = web_hive.WebHive()
+
+    def fetch(self, url):
+        return self._make_request(url)
     
-    def make_request(self, url):
+    def _make_request(self, url):
         cached = self.cache.get(url)
         if cached:
             return cached

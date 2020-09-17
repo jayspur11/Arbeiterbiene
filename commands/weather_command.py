@@ -81,13 +81,13 @@ class WeatherCommand(base_command.BaseCommand):
             worker = web_worker.WebWorker()
             # convert zip to lat/lon
             geocode = json.loads(
-                worker.make_request(
+                worker.fetch(
                     "https://public.opendatasoft.com/api/records/1.0/search?"
                     "dataset=us-zip-code-latitude-and-longitude&q=zip={zip}".
                     format(zip=zip_code)))
             # fetch current & forecasted weather
             weather = json.loads(
-                worker.make_request(
+                worker.fetch(
                     "https://api.openweathermap.org/data/2.5/onecall?"
                     "lat={lat}&lon={lon}&exclude=minutely,hourly&appid={key}&"
                     "units=imperial".format(lat=geocode["latitude"],
