@@ -9,6 +9,19 @@ class WebWorker:
         self.ttl = None
 
     def fetch(self, url):
+        """Perform the data retrieval.
+
+        At this level, this is just a wrapper for `_make_request`; subclasses
+        should override this method to provide more specialized interfaces (i.e.
+        take in only the dynamic pieces of the request, and return a
+        fully-processed object).
+
+        Args:
+            url (string): The URL to fetch from.
+
+        Returns:
+            string: The decoded response.
+        """
         return self._make_request(url)
     
     def _make_request(self, url):
