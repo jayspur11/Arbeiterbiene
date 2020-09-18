@@ -1,5 +1,6 @@
 from commands.core import base_command
-from commands.core import web_command
+from web.workers import geocode_worker
+from web.workers import weather_worker
 from urllib import request
 
 import json
@@ -20,31 +21,35 @@ class WeatherCommand(base_command.BaseCommand):
         Args:
             api_key (string): API key to use for OWM requests.
         """
-        self._api_key = api_key
+        self._weather_worker = weather_worker.WeatherWorker(api_key)
+        self._geocode_worker = geocode_worker.GeocodeWorker()
 
-    def build_message(self, zip, city, curtemp, conditions, feelslike, high,
-                      low, forecast):
+    def list_conditions(self, conditions):
+        """Generate a string listing the given conditions.
+
+        E.g. ["smoke", "clouds", "fog"] -> "smoke, clouds, and fog"
+
+        Args:
+            conditions (list[dict{string:string}]): Conditions to list. These
+                are expected to come from OpenWeatherMap, so it should be a list
+                of dicts that have a "description" entry.
+
+        Returns:
+            (string) The conditions in a human-readable list.
+        """
+        descriptions = [condition["description"] for condition in conditions]
+        return ", and ".join(
+            filter(None, [", ".join(descriptions[:-1]), *descriptions[-1:]]))
+
+    def build_message(self, zip, city, current_weather, daily_forecast):
         """Build the message about weather to send to Discord.
 
         Args:
             zip (string): Zip code weather was requested for.
             city (string): City name that the given zip maps to.
-            curtemp (string): Current temperature (°F).
-            conditions (list[string]): Current weather conditions (e.g. sunny).
-            feelslike (string): What the current temperature feels like (°F).
-            high (string): Forecasted max temperature for the day (°F).
-            low (string): Forecasted min temperature for the day (°F).
-            forecast (list[string]): Forecasted weather conditions (e.g. sunny).
-
-        Returns:
-            string: Formatted message ready to send to Discord.
+            current_weather (dict{string:string}): Parsed from OpenWeatherMap.
+            daily_forecast (dict{string:string}): Parsed from OpenWeatherMap.
         """
-        conditions = [condition["description"] for condition in conditions]
-        condition = ", and ".join(
-            filter(None, [", ".join(conditions[:-1]), *conditions[-1:]]))
-        forecast = [condition["description"] for condition in forecast]
-        forecast = ", and ".join(
-            filter(None, [", ".join(forecast[:-1]), *forecast[-1:]]))
         return (
             "*Powered by OpenWeatherMap.org*\n"
             "Weather for {zip} ({city}):"
@@ -53,14 +58,15 @@ class WeatherCommand(base_command.BaseCommand):
             "{feelslike:.0f}°F)."
             "\n\n"
             "Today is forecasted to have a high of {high:.0f}°F and a low of "
-            "{low:.0f}°F, with {forecast}.".format(city=city,
-                                                   zip=zip,
-                                                   curtemp=float(curtemp),
-                                                   condition=condition,
-                                                   feelslike=float(feelslike),
-                                                   high=float(high),
-                                                   low=float(low),
-                                                   forecast=forecast))
+            "{low:.0f}°F, with {forecast}.".format(
+                zip=zip,
+                city=city,
+                curtemp=float(current_weather["temp"]),
+                condition=self.list_conditions(current_weather["weather"]),
+                feelslike=float(current_weather["feels_like"]),
+                high=float(daily_forecast["temp"]["max"]),
+                low=float(daily_forecast["temp"]["min"]),
+                forecast=self.list_conditions(daily_forecast["weather"])))
 
     def help_text(self):
         return (
@@ -74,28 +80,8 @@ class WeatherCommand(base_command.BaseCommand):
             raise ValueError
         async with await command_io.message.channel.typing():
             zip_code = zip_code_match.group()
-            # convert zip to lat/lon
-            ods_req = web_command.WebCommandRequest(
-                '', "https://public.opendatasoft.com/api/records/1.0/search?"
-                "dataset=us-zip-code-latitude-and-longitude&q=zip={zip}".
-                format(zip=zip_code))
-            with request.urlopen(ods_req.request) as ods_res:
-                geocode = json.loads(
-                    ods_res.read().decode())["records"][0]["fields"]
-            # fetch current & forecasted weather
-            owm_req = web_command.WebCommandRequest(
-                '', "https://api.openweathermap.org/data/2.5/onecall?"
-                "lat={lat}&lon={lon}&exclude=minutely,hourly&appid={key}&"
-                "units=imperial".format(lat=geocode["latitude"],
-                                        lon=geocode["longitude"],
-                                        key=self._api_key))
-            with request.urlopen(owm_req.request) as owm_res:
-                weather = json.loads(owm_res.read().decode())
-            current_weather = weather["current"]
-            daily_forecast = weather["daily"][0]
-            response = self.build_message(
-                zip_code, geocode["city"], current_weather["temp"],
-                current_weather["weather"], current_weather["feels_like"],
-                daily_forecast["temp"]["max"], daily_forecast["temp"]["min"],
-                daily_forecast["weather"])
+            current_weather, daily_forecast = self._weather_worker.fetch(zip_code)
+            geocode = self._geocode_worker.fetch(zip_code)
+            response = self.build_message(zip_code, geocode["city"],
+                                          current_weather, daily_forecast[0])
         await command_io.message.channel.send(response)
