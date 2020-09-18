@@ -57,6 +57,17 @@ class WeatherCommandTest(unittest.TestCase):
         mock_send = mock_cmdio.message.channel.send
         mock_send.assert_called_once()
 
+        urlopen_args = mock_urlopen.call_args_list
+        self.assertEqual(2, len(urlopen_args))
+
+        ods_url = urlopen_args[0][0][0].full_url
+        self.assertIn("12345", ods_url)
+
+        owm_url = urlopen_args[1][0][0].full_url
+        self.assertIn("lat=lat", owm_url)
+        self.assertIn("lon=long", owm_url)
+        self.assertIn("appid=apikey", owm_url)
+
 
 if __name__ == "__main__":
     unittest.main()
