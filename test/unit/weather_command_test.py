@@ -45,6 +45,7 @@ def urlopen_mocked(req):
     mock_context_manager.__enter__.return_value = mock_response
     return mock_context_manager
 
+
 class WeatherCommandTest(unittest.TestCase):
     @unittest.mock.patch('urllib.request.urlopen', side_effect=urlopen_mocked)
     def test_basic_command(self, mock_urlopen):
@@ -55,6 +56,7 @@ class WeatherCommandTest(unittest.TestCase):
 
         mock_send = mock_cmdio.message.channel.send
         mock_send.assert_called_once()
+
 
 if __name__ == "__main__":
     unittest.main()
