@@ -1,5 +1,6 @@
 from commands.core import base_command
-from web import web_worker
+from web.workers import geocode_worker
+from web.workers import weather_worker
 from urllib import request
 
 import json
@@ -20,7 +21,8 @@ class WeatherCommand(base_command.BaseCommand):
         Args:
             api_key (string): API key to use for OWM requests.
         """
-        self._api_key = api_key
+        self._weather_worker = weather_worker.WeatherWorker(api_key)
+        self._geocode_worker = geocode_worker.GeocodeWorker()
 
     def list_conditions(self, conditions):
         """Generate a string listing the given conditions.
@@ -78,23 +80,8 @@ class WeatherCommand(base_command.BaseCommand):
             raise ValueError
         async with command_io.message.channel.typing():
             zip_code = zip_code_match.group()
-            worker = web_worker.WebWorker()
-            # convert zip to lat/lon
-            geocode = json.loads(
-                worker.fetch(
-                    "https://public.opendatasoft.com/api/records/1.0/search?"
-                    "dataset=us-zip-code-latitude-and-longitude&q=zip={zip}".
-                    format(zip=zip_code)))
-            # fetch current & forecasted weather
-            weather = json.loads(
-                worker.fetch(
-                    "https://api.openweathermap.org/data/2.5/onecall?"
-                    "lat={lat}&lon={lon}&exclude=minutely,hourly&appid={key}&"
-                    "units=imperial".format(lat=geocode["latitude"],
-                                            lon=geocode["longitude"],
-                                            key=self._api_key)))
-            current_weather = weather["current"]
-            daily_forecast = weather["daily"][0]
+            current_weather, daily_forecast = self._weather_worker.fetch(zip_code)
+            geocode = self._geocode_worker.fetch(zip_code)
             response = self.build_message(zip_code, geocode["city"],
-                                          current_weather, daily_forecast)
+                                          current_weather, daily_forecast[0])
         await command_io.message.channel.send(response)
