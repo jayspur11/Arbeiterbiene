@@ -21,4 +21,5 @@ class GeocodeWorker(web_worker.WebWorker):
         url = ("https://public.opendatasoft.com/api/records/1.0/search?"
                "dataset=us-zip-code-latitude-and-longitude&q=zip={zip}".format(
                    zip=zip_code))
-        return json.loads(self._make_request(url))
+        response = json.loads(self._make_request(url))
+        return response["records"][0]["fields"]
