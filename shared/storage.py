@@ -15,7 +15,7 @@ class DatabaseHandler:
                     table=table_name, cols=', '.join(column_names))))
 
     async def _connect_to_db(self, db_name):
-        self._connection = sqlite3.connect(db_name)
+        self._connection = sqlite3.connect(db_name, isolation_level=None)
 
     async def _execute_statement(self, *args):
         return self._cursor.execute(*args)
