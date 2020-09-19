@@ -2,7 +2,7 @@ import asyncio
 import sqlite3
 
 
-class DatabaseHandler:
+class Hive:
     def __init__(self, table_name, column_names, db_name='arbeiterbiene.db'):
         self._db_thread = asyncio.new_event_loop()
         self._db_thread.run_until_complete(self._connect_to_db(db_name))

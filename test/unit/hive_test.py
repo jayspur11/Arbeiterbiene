@@ -1,11 +1,11 @@
-from shared.storage import DatabaseHandler
-
 import os
 import sqlite3
 import unittest
 
+from storage import hive
 
-class StorageTest(unittest.TestCase):
+
+class HiveTest(unittest.TestCase):
     def setUp(self):
         self.connection = sqlite3.connect('test.db')
 
@@ -14,7 +14,7 @@ class StorageTest(unittest.TestCase):
         os.remove('test.db')
 
     def test_handler_initialization(self):
-        _ = DatabaseHandler('TestTable', ('Col1', 'Col2'), db_name='test.db')
+        _ = hive.Hive('TestTable', ('Col1', 'Col2'), db_name='test.db')
 
         table_query = self.connection.execute('SELECT COUNT(1) AS count'
                                               ' FROM sqlite_master'
