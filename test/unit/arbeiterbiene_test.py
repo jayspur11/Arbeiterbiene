@@ -23,7 +23,7 @@ class ArbeiterbieneTest(unittest.TestCase):
             patch.stop()
 
     def test_command_called_in_dm(self):
-        bot = arbeiterbiene.Arbeiterbiene('')
+        bot = arbeiterbiene.Arbeiterbiene('', '')
         message = mock.Mock()
         message.content = '@bot command argument1 argument2'
         message.channel.mock_add_spec(discord.DMChannel)
@@ -33,7 +33,7 @@ class ArbeiterbieneTest(unittest.TestCase):
         self._mock_command.run.assert_called_once()
 
     def test_command_called_in_group(self):
-        bot = arbeiterbiene.Arbeiterbiene('')
+        bot = arbeiterbiene.Arbeiterbiene('', '')
         message = mock.Mock()
         message.content = '@bot command argument1 argument2'
         message.channel.mock_add_spec(discord.GroupChannel)
@@ -43,7 +43,7 @@ class ArbeiterbieneTest(unittest.TestCase):
         self._mock_command.run.assert_called_once()
 
     def test_command_called_when_mentioned(self):
-        bot = arbeiterbiene.Arbeiterbiene('')
+        bot = arbeiterbiene.Arbeiterbiene('', '')
         _mock_user = mock.patch.object(arbeiterbiene.Arbeiterbiene,
                                        'user',
                                        id=123).start()
@@ -55,7 +55,7 @@ class ArbeiterbieneTest(unittest.TestCase):
         self._mock_command.run.assert_called_once()
 
     def test_message_content_pruned(self):
-        bot = arbeiterbiene.Arbeiterbiene('')
+        bot = arbeiterbiene.Arbeiterbiene('', '')
         message = mock.Mock()
         message.content = '@bot command argument1 argument2'
         message.channel.mock_add_spec(discord.DMChannel)
