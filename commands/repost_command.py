@@ -1,9 +1,5 @@
-import asyncio
-import discord
-import random
-
 from commands.core import base_command
-from datetime import datetime
+from workers import repost_worker
 
 
 class RepostCommand(base_command.BaseCommand):
@@ -39,28 +35,5 @@ class RepostCommand(base_command.BaseCommand):
             self._requests[channel].cancel()
             del self._requests[channel]
         attachment = command_io.message.attachments[0]
-        self._requests[channel] = _RepostRequest(channel, attachment.url)
-
-
-class _RepostRequest:
-    def __init__(self, channel, url):
-        self._message = None
-        self._channel = channel
-        self._url = url
-        self._schedule()
-
-    def cancel(self):
-        self._future.cancel()
-
-    def _schedule(self):
-        self._future = asyncio.ensure_future(self._repost_and_reschedule())
-
-    async def _repost_and_reschedule(self):
-        await asyncio.sleep(random.randint(3600, 3 * 3600))
-        now = datetime.now()
-        if 8 <= now.time().hour < 17:
-            if self._message:
-                await self._message.delete()
-            self._message = await self._channel.send(
-                embed=discord.Embed().set_image(url=self._url))
-        self._schedule()
+        self._requests[channel] = repost_worker.RepostWorker(
+            channel, attachment.url)
