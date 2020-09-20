@@ -6,9 +6,9 @@ import random
 
 class RepostWorker:
     def __init__(self, channel, url):
-        self._message = None
-        self._channel = channel
-        self._url = url
+        self.last_message = None
+        self.channel = channel
+        self.url = url
         self._schedule()
 
     def cancel(self):
@@ -21,8 +21,8 @@ class RepostWorker:
         await asyncio.sleep(random.randint(3600, 3 * 3600))
         now = datetime.datetime.now()
         if 8 <= now.time().hour < 17:
-            if self._message:
-                await self._message.delete()
-            self._message = await self._channel.send(
-                embed=discord.Embed().set_image(url=self._url))
+            if self.last_message:
+                await self.last_message.delete()
+            self.last_message = await self.channel.send(
+                embed=discord.Embed().set_image(url=self.url))
         self._schedule()
