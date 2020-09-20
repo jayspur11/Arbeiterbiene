@@ -31,7 +31,7 @@ class Honeycomb:
         """tuple(string...): Names of the columns in this class' table."""
         raise NotImplementedError
 
-    def _run_query(self, query, *args):
+    def _run_query(self, query, *args, **kwargs):
         """Run the given query.
 
         This is a convenience wrapper; the actual execution happens on the
@@ -44,4 +44,5 @@ class Honeycomb:
             list[sqlite3.Row]: Results of the query.
         """
         return self._db_thread.run_until_complete(
-            _run_async(self._db_connection.execute, query, *args)).fetchall()
+            _run_async(self._db_connection.execute, query, *args,
+                       **kwargs)).fetchall()
