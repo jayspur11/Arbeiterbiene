@@ -26,7 +26,7 @@ class RepostHC(honeycomb.Honeycomb):
     def update_repost(self, repost_worker):
         channel = repost_worker.channel
         message_id = (repost_worker.last_message.id
-        if repost_worker.last_message else "NULL")
+                      if repost_worker.last_message else "NULL")
         self._run_query(
             "UPDATE RepostCommands"
             "   SET LastMessageID=:msg, URL=:url"
