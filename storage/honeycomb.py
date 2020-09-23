@@ -41,8 +41,10 @@ class Honeycomb:
             query (string): SQL query to execute.
 
         Returns:
-            list[sqlite3.Row]: Results of the query.
+            sqlite3.Cursor: Cursor pointing to the results of the query.
+                Subclasses should translate this for their interface, rather
+                than returning it directly.
         """
         return self._db_thread.run_until_complete(
             _run_async(self._db_connection.execute, query, *args,
-                       **kwargs)).fetchall()
+                       **kwargs))
