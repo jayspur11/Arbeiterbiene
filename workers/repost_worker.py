@@ -5,8 +5,8 @@ import random
 
 
 class RepostWorker:
-    def __init__(self, channel, url):
-        self.last_message = None
+    def __init__(self, channel, url, last_message=None):
+        self.last_message = last_message
         self.channel = channel
         self.url = url
         self._schedule()

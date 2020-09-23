@@ -11,7 +11,7 @@ class RepostHC(honeycomb.Honeycomb):
     def _column_names(self):
         return ("GuildID", "ChannelID", "LastMessageID", "URL")
 
-    def store_repost(self, repost_worker):
+    def create_repost(self, repost_worker):
         channel = repost_worker.channel
         message_id = (repost_worker.last_message.id
                       if repost_worker.last_message else "NULL")
@@ -36,7 +36,7 @@ class RepostHC(honeycomb.Honeycomb):
             guild=channel.guild.id,
             channel=channel.id)
 
-    def remove_repost(self, repost_worker):
+    def delete_repost(self, repost_worker):
         channel = repost_worker.channnel
         self._run_query(
             "DELETE FROM RepostCommands"
