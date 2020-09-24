@@ -20,6 +20,8 @@ class Arbeiterbiene(discord_client.Client):
             airnowapi_key, owm_key)
 
     async def on_ready(self):
+        for command in self._command_registry.values():
+            command.load_with_client(self)
         print("Hello world!")
 
     async def on_message(self, message):

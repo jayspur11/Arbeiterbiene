@@ -1,11 +1,13 @@
 from commands.core import base_command
+from storage import repost_hc
 from workers import repost_worker
 
 
 class RepostCommand(base_command.BaseCommand):
     """Class to add a 'repost' command to the bot."""
     def __init__(self):
-        self._requests = {}  # {discord.Channel: _RepostRequest}
+        self._requests = {}  # {discord.Channel: repost_worker.RepostWorker}
+        self._honeycomb = repost_hc.RepostHC()
 
     @classmethod
     def trigger_word(cls):
@@ -37,3 +39,7 @@ class RepostCommand(base_command.BaseCommand):
         attachment = command_io.message.attachments[0]
         self._requests[channel] = repost_worker.RepostWorker(
             channel, attachment.url)
+
+    def load_with_client(self, client):
+        reposts = self._honeycomb.reload_reposts(client)
+        self._requests.update({repost.channel: repost for repost in reposts})

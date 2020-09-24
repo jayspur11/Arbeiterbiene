@@ -17,3 +17,7 @@ class BaseCommand:
     async def run(self, command_io):
         """Executes the command."""
         raise NotImplementedError
+
+    def load_with_client(self, client):
+        """Loads anything that requires a client connection."""
+        pass
