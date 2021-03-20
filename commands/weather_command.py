@@ -78,7 +78,7 @@ class WeatherCommand(base_command.BaseCommand):
         zip_code_match = _zip_code_re.search(command_io.message.content)
         if not zip_code_match:
             raise ValueError
-        async with await command_io.message.channel.typing():
+        async with command_io.message.channel.typing():
             zip_code = zip_code_match.group()
             current_weather, daily_forecast = self._weather_worker.fetch(zip_code)
             geocode = self._geocode_worker.fetch(zip_code)
