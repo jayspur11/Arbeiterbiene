@@ -1,11 +1,12 @@
+import time
+
 class WebHive:
     """Class to cache information from the web."""
     class WebCell:
         """Individual cache entry in a WebHive."""
         def __init__(self, data, ttl):
             self.data = data
-            # todo: convert to datetime
-            self._expiry = ttl
+            self._expiry = round(time.time()) + ttl if ttl else None
 
         def expired(self):
             """Check whether the data has expired.
@@ -15,8 +16,7 @@ class WebHive:
             """
             if not self._expiry:
                 return False
-            # todo: check expiry against current time
-            return True
+            return time.time() > self._expiry
 
     def __init__(self):
         self.cells = {}
