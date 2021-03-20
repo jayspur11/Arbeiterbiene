@@ -39,6 +39,13 @@ def _roll_dice(num, sides):
     return '({})'.format(' + '.join(results))
 
 
+def _roll_fudge(num, _):
+    results = []
+    for _ in range(num):
+        results.append(str(random.randint(-1, 1)))
+    return '({})'.format(' + '.join(results))
+
+
 def _roll_table(num, table):
     results = []
     highest = len(table) - 1
@@ -65,16 +72,21 @@ def _parse_roll(command):
     while command:
         cmd0 = command[0]
         if cmd0 == 'd':
-            arg, command = _parse_arg(command[1:])
             arg1 = arg_stack.pop()
             if not _numeric_equation_re.fullmatch(arg1):
                 raise ValueError
+
+            arg, command = _parse_arg(command[1:])
             if arg[0] == '[':
                 func = "_roll_table"
-            else:
+            elif arg == 'f':
+                arg = '"f"'
+                func = "_roll_fudge"
+            elif _numeric_equation_re.fullmatch(arg):
                 func = "_roll_dice"
-                if not _numeric_equation_re.fullmatch(arg):
-                    raise ValueError
+            else:
+                raise ValueError
+
             result.append(str(eval("{}({}, {})".format(func, arg1, arg))))
         elif cmd0 in "+-":
             result.append(cmd0)
@@ -103,6 +115,9 @@ def _parse_arg(command):
         arg = "({})".format(_parse_roll(subroll))
     elif cmd0 == "[":
         arg, command = _break_out_table(command)
+    elif cmd0 == 'f':
+        arg = 'f'
+        command = command[1:]
     else:
         match = _num_re.match(command)
         arg = match.group()
