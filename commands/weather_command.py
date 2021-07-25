@@ -1,8 +1,8 @@
 from commands.core import base_command
-from web.workers import geocode_worker
 from web.workers import weather_worker
 from urllib import request
 
+import data
 import json
 import re
 
@@ -22,7 +22,6 @@ class WeatherCommand(base_command.BaseCommand):
             api_key (string): API key to use for OWM requests.
         """
         self._weather_worker = weather_worker.WeatherWorker(api_key)
-        self._geocode_worker = geocode_worker.GeocodeWorker()
 
     def list_conditions(self, conditions):
         """Generate a string listing the given conditions.
@@ -81,7 +80,7 @@ class WeatherCommand(base_command.BaseCommand):
         async with command_io.message.channel.typing():
             zip_code = zip_code_match.group()
             current_weather, daily_forecast = self._weather_worker.fetch(zip_code)
-            geocode = self._geocode_worker.fetch(zip_code)
+            geocode = data.geocodes[zip_code]
             response = self.build_message(zip_code, geocode["city"],
                                           current_weather, daily_forecast[0])
         await command_io.message.channel.send(response)
