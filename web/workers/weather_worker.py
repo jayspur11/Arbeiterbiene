@@ -1,7 +1,7 @@
+import data
 import json
 
 from web import web_worker
-from web.workers import geocode_worker
 
 
 class WeatherWorker(web_worker.WebWorker):
@@ -28,11 +28,11 @@ class WeatherWorker(web_worker.WebWorker):
             list[dict{string:string}]: Forecasted weather (one item per day,
                 starting with the current day).
         """
-        geocode = geocode_worker.GeocodeWorker().fetch(zip_code)
+        geocode = data.geocodes[zip_code]
         url = ("https://api.openweathermap.org/data/2.5/onecall?"
                "lat={lat}&lon={lon}&exclude=minutely,hourly&appid={key}&"
-               "units=imperial".format(lat=geocode["latitude"],
-                                       lon=geocode["longitude"],
+               "units=imperial".format(lat=geocode["lat"],
+                                       lon=geocode["lng"],
                                        key=self._api_key))
         weather = json.loads(self._make_request(url))
         return (weather["current"], weather["daily"])
