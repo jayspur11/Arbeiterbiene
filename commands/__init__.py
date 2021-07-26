@@ -1,5 +1,6 @@
 from commands.aqi_command import AqiCommand
 from commands.die_command import DieCommand
+from commands.iseven_command import IsevenCommand
 from commands.meow_command import MeowCommand
 from commands.poll_command import PollCommand
 from commands.repost_command import RepostCommand
@@ -22,6 +23,7 @@ def command_registry(airnowapi_key, owm_key):
     return {
         AqiCommand.trigger_word(): AqiCommand(airnowapi_key),
         DieCommand.trigger_word(): DieCommand(),
+        IsevenCommand.trigger_word(): IsevenCommand(),
         MeowCommand.trigger_word(): MeowCommand(),
         PollCommand.trigger_word(): PollCommand(),
         RepostCommand.trigger_word(): RepostCommand(),
